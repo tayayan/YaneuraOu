@@ -1843,7 +1843,7 @@ namespace {
 		// Stockfish9までは、futility pruningを、root node以外に適用していたが、
 		// Stockfish10でnonPVにのみの適用に変更になった。
 
-		if (!PvNode
+		if (!ss->ttPv
 			&&  depth < PARAM_FUTILITY_RETURN_DEPTH/*9*/
 			&&  eval - futility_margin(depth, improving) >= beta
 			&&  eval < VALUE_KNOWN_WIN + 700)
