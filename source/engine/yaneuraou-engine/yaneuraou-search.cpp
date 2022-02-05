@@ -1152,7 +1152,14 @@ void Thread::search()
 		// もしSkillLevelが有効であり、時間いっぱいになったなら、準最適なbest moveを選ぶ。
 		if (skill.enabled() && skill.time_to_pick(rootDepth))
 			skill.pick_best(multiPV);
-
+		
+		// Use part of the gained time from a previous stable move for the current move
+		for (Thread* th : Threads)
+		{
+			totBestMoveChanges += th->bestMoveChanges;
+			th->bestMoveChanges = 0;
+		}
+		
 		// 残り時間的に、次のiterationに行って良いのか、あるいは、探索をいますぐここでやめるべきか？
 		if (Limits.use_time_management())
 		{
@@ -1170,13 +1177,6 @@ void Thread::search()
 
 				timeReduction = lastBestMoveDepth + 9 < completedDepth ? 1.92 : 0.95;
 				double reduction = (1.47 + mainThread->previousTimeReduction) / (2.32 * timeReduction);
-
-				// Use part of the gained time from a previous stable move for the current move
-				for (Thread* th : Threads)
-				{
-					totBestMoveChanges += th->bestMoveChanges;
-					th->bestMoveChanges = 0;
-				}
 
 				// rootでのbestmoveの不安定性。
 				// bestmoveが不安定であるなら思考時間を増やしたほうが良い。

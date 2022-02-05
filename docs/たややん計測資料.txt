@@ -22,3 +22,8 @@ Simplify reduction on rootNode when bestMoveChanges is high
 284-171-273
 有意差なし、とりあえず採用
 
+
+Correctly reset bestMoveChanges
+301-164-302
+有意差なし、とりあえず採用
+
