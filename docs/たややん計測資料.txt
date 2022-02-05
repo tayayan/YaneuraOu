@@ -16,3 +16,9 @@ Refine futility pruning for parent nodes
 Remove depth dependence and use same limit (2000) as stat_bonus
 311-252-349
 良くないかも。後ほどチェック
+
+
+Simplify reduction on rootNode when bestMoveChanges is high
+284-171-273
+有意差なし、とりあえず採用
+

@@ -2495,9 +2495,9 @@ namespace {
 					&& !likelyFailLow)
 					r -= 2 ;
 
-				// Increase reduction at root and non-PV nodes when the best move does not change frequently
-				// best moveが頻繁に変更されていないならば局面が安定しているのだろうから、rootとnon-PVではreductionを増やす。
-				if (   (rootNode || !PvNode)
+				// Increase reduction at non-PV nodes when the best move does not change frequently
+				// best moveが頻繁に変更されていないならば局面が安定しているのだろうから、non-PVではreductionを増やす。
+				if (   !PvNode
 					&& thisThread->bestMoveChanges <= 2)
 					r++;
 
