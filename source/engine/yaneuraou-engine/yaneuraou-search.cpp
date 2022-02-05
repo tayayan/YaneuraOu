@@ -2497,10 +2497,9 @@ namespace {
 					&& !likelyFailLow)
 					r -= 2 ;
 
-				// Increase reduction at non-PV nodes when the best move does not change frequently
-				// best moveが頻繁に変更されていないならば局面が安定しているのだろうから、non-PVではreductionを増やす。
-				if (   !PvNode
-					&& thisThread->bestMoveChanges <= 2)
+				// Increase reduction at non-PV nodes
+				// non-PVではreductionを増やす。
+				if (!PvNode)
 					r++;
 
 				// Decrease reduction if opponent's move count is high (~5 Elo)
