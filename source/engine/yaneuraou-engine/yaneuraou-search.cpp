@@ -2457,6 +2457,8 @@ namespace {
 
 			// 指し手で1手進める
 			pos.do_move(move, st, givesCheck);
+			
+			bool doDeeperSearch = false;
 
 			// -----------------------
 			// Step 16. Late moves reduction / extension (LMR, ~200 Elo)
@@ -2580,7 +2582,7 @@ namespace {
 				// 上の探索によりalphaを更新しそうだが、いい加減な探索なので信頼できない。まともな探索で検証しなおす。
 
 				doFullDepthSearch = value > alpha && d < newDepth;
-
+				doDeeperSearch = value > alpha + 88;
 				didLMR = true;
 			}
 			else
@@ -2601,7 +2603,7 @@ namespace {
 			// ※　静止探索は残り探索深さはdepth = 0として開始されるべきである。(端数があるとややこしいため)
 			if (doFullDepthSearch)
 			{
-				value = -search<NonPV>(pos, ss + 1, -(alpha + 1), -alpha, newDepth, !cutNode);
+				value = -search<NonPV>(pos, ss + 1, -(alpha + 1), -alpha, newDepth + doDeeperSearch, !cutNode);
 
 				// If the move passed LMR update its stats
 				if (didLMR && !captureOrPawnPromotion)

@@ -46,3 +46,9 @@ Tweak time management
 Assign extra bonus for previous move that caused a fail low more often
 267-150-240
 多分弱くはなっていない、採用
+
+
+Introduce post-lmr extensions
+1312-974-1332
+有意差なし、とりあえず採用
+
