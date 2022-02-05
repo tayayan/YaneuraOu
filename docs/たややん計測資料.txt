@@ -27,3 +27,10 @@ Correctly reset bestMoveChanges
 301-164-302
 有意差なし、とりあえず採用
 
+
+Do more aggressive pruning for some node types
+195-125-181
+多分弱くはなっていない、採用
+
+
+

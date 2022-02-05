@@ -2257,6 +2257,8 @@ namespace {
 
 					history += thisThread->mainHistory[us][from_to(move)];
 					
+					lmrDepth = std::max(0, lmrDepth - (beta - alpha < thisThread->rootDelta / 4));
+					
 					// Futility pruning: parent node (~5 Elo)
 					// 親nodeの時点で子nodeを展開する前にfutilityの対象となりそうなら枝刈りしてしまう。
 
