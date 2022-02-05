@@ -1,0 +1,7 @@
+Less futility pruning変更
+527-354-547
+有意差なし、一応採用
+
+Use fraction of history heuristics in futility pruning & Adjust usage of history in futility pruning
+416-267-306
+強くなっていそう。採用

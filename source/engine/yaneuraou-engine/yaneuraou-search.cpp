@@ -2244,16 +2244,19 @@ namespace {
 				}
 				else
 				{
+					int history =   (*contHist[0])[to_sq(move)][movedPiece]
+								  + (*contHist[1])[to_sq(move)][movedPiece]
+								  + (*contHist[3])[to_sq(move)][movedPiece];
 					// // Continuation history based pruning (~20 Elo)
 					// Continuation historyに基づいた枝刈り(historyの値が悪いものに関してはskip) : ~20 Elo
 
 					if (lmrDepth < PARAM_PRUNING_BY_HISTORY_DEPTH/*5*/
-						&& (*contHist[0])[to_sq(move)][movedPiece]
-						+  (*contHist[1])[to_sq(move)][movedPiece]
-						+  (*contHist[3])[to_sq(move)][movedPiece] < -3000 * depth + 3000)
+						&& history < -3000 * depth + 3000)
 						// contHist[][]はStockfishと逆順なので注意。
 						continue;
 
+					history += thisThread->mainHistory[us][from_to(move)];
+					
 					// Futility pruning: parent node (~5 Elo)
 					// 親nodeの時点で子nodeを展開する前にfutilityの対象となりそうなら枝刈りしてしまう。
 
@@ -2262,7 +2265,7 @@ namespace {
 
 					if (   !ss->inCheck
 						&& lmrDepth < PARAM_FUTILITY_AT_PARENT_NODE_DEPTH/*8*/
-						&& ss->staticEval + PARAM_FUTILITY_AT_PARENT_NODE_MARGIN1/*172*/ + PARAM_FUTILITY_MARGIN_BETA/*145*/ * lmrDepth <= alpha)
+						&& ss->staticEval + PARAM_FUTILITY_AT_PARENT_NODE_MARGIN1/*172*/ + PARAM_FUTILITY_MARGIN_BETA/*145*/ * lmrDepth + history / 128 <= alpha)
 						continue;
 
 					// ※　このLMRまわり、棋力に極めて重大な影響があるので枝刈りを入れるかどうかを含めて慎重に調整すべき。
