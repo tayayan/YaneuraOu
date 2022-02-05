@@ -36,9 +36,9 @@ PARAM_DEFINE PARAM_FUTILITY_MARGIN_ALPHA1 = 199;
 
 // 
 
-// 元の値 = 145 , step = 20
+// 元の値 = 139 , step = 20
 // [PARAM] min:100,max:240,step:5,interval:1,time_rate:1,fixed
-PARAM_DEFINE PARAM_FUTILITY_MARGIN_BETA = 170;
+PARAM_DEFINE PARAM_FUTILITY_MARGIN_BETA = 139;
 
 
 // 静止探索でのfutility pruning
@@ -59,9 +59,9 @@ PARAM_DEFINE PARAM_FUTILITY_RETURN_DEPTH = 9;
 PARAM_DEFINE PARAM_FUTILITY_AT_PARENT_NODE_DEPTH = 8;
 
 // 親nodeでのfutility margin
-// 元の値 = 172 , step = 30
+// 元の値 = 142 , step = 30
 // [PARAM] min:100,max:400,step:20,interval:1,time_rate:1,fixed
-PARAM_DEFINE PARAM_FUTILITY_AT_PARENT_NODE_MARGIN1 = 172;
+PARAM_DEFINE PARAM_FUTILITY_AT_PARENT_NODE_MARGIN1 = 142;
 
 // 元の値 = 21 , step = 4
 // [PARAM] min:15,max:50,step:2,interval:1,time_rate:1,fixed

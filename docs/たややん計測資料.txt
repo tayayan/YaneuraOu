@@ -5,3 +5,5 @@ Less futility pruning変更
 Use fraction of history heuristics in futility pruning & Adjust usage of history in futility pruning
 416-267-306
 強くなっていそう。採用
+
+Refine futility pruning for parent nodes

@@ -2265,7 +2265,7 @@ namespace {
 
 					if (   !ss->inCheck
 						&& lmrDepth < PARAM_FUTILITY_AT_PARENT_NODE_DEPTH/*8*/
-						&& ss->staticEval + PARAM_FUTILITY_AT_PARENT_NODE_MARGIN1/*172*/ + PARAM_FUTILITY_MARGIN_BETA/*145*/ * lmrDepth + history / 128 <= alpha)
+						&& ss->staticEval + PARAM_FUTILITY_AT_PARENT_NODE_MARGIN1/*142*/ + PARAM_FUTILITY_MARGIN_BETA/*139*/ * lmrDepth + history / 64 <= alpha)
 						continue;
 
 					// ※　このLMRまわり、棋力に極めて重大な影響があるので枝刈りを入れるかどうかを含めて慎重に調整すべき。
