@@ -2317,7 +2317,7 @@ namespace {
 
 			// singular延長をするnodeであるか。
 			if (   !rootNode
-				&&  depth >= PARAM_SINGULAR_EXTENSION_DEPTH/*7*/
+				&&  depth >= PARAM_SINGULAR_EXTENSION_DEPTH/*6*/ + 2 * (PvNode && tte->is_pv())
 				&&  move == ttMove
 				&& !excludedMove // 再帰的なsingular延長を除外する。
 			/*  &&  ttValue != VALUE_NONE Already implicit in the next condition */

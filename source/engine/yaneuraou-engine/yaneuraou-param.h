@@ -168,9 +168,9 @@ PARAM_DEFINE PARAM_PROBCUT_MARGIN2 = 44;
 // singular extensionの前提depth。
 // これ変更すると他のパラメーターががらっと変わるので固定しておく。
 // 10秒設定だと6か8あたりに局所解があるようだ。
-// 元の値 = 7 , step = 1
+// 元の値 = 6 , step = 1
 // [PARAM] min:4,max:13,step:1,interval:2,time_rate:1,fixed
-PARAM_DEFINE PARAM_SINGULAR_EXTENSION_DEPTH = 7;
+PARAM_DEFINE PARAM_SINGULAR_EXTENSION_DEPTH = 6;
 
 // singular extensionのmarginを計算するときの係数(Stockfishのコードから256倍にscalingしてある)
 // +64すると自己対局だとすごく強くなって見えるかもしれないが、まやかしである。
