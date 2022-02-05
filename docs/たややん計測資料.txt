@@ -32,7 +32,12 @@ Do more aggressive pruning for some node types
 195-125-181
 多分弱くはなっていない、採用
 
+
 Simplifies bestMoveChanges from LMR
 210-150-239
 良くないかも。後ほどチェック
 
+
+Tweak time management
+303-185-266
+多分弱くはなっていない、採用

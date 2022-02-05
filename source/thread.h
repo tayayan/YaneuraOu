@@ -197,6 +197,7 @@ struct MainThread: public Thread
 	// 前回の探索時のスコア。
 	// 次回の探索のときに何らか使えるかも。
 	Value bestPreviousScore;
+	Value bestPreviousAverageScore;
 
 	// 時間まぎわのときに探索を終了させるかの判定に用いるための、
 	// 反復深化のiteration、前4回分のScore

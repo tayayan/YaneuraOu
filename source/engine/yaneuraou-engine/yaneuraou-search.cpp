@@ -697,6 +697,7 @@ SKIP_SEARCH:;
 
 	// 次回の探索のときに何らか使えるのでベストな指し手の評価値を保存しておく。
 	bestPreviousScore = bestThread->rootMoves[0].score;
+	bestPreviousAverageScore = bestThread->rootMoves[0].averageScore;
 
 	// 投了スコアが設定されていて、歩の価値を100として正規化した値がそれを下回るなら投了。
 	// ただし定跡の指し手にhitした場合などはrootMoves[0].score == -VALUE_INFINITEになっているのでそれは除外。
@@ -1168,8 +1169,9 @@ void Thread::search()
 			{
 				// 1つしか合法手がない(one reply)であるだとか、利用できる時間を使いきっているだとか、
 
-				double fallingEval = (318 + 6 * (mainThread->bestPreviousScore - bestValue)
-					+ 6 * (mainThread->iterValue[iterIdx] - bestValue)) / 825.0;
+				double fallingEval = (142 + 6 * (mainThread->bestPreviousScore - bestValue)
+										  + 6 * (mainThread->bestPreviousAverageScore - bestValue)
+										  + 6 * (mainThread->iterValue[iterIdx] - bestValue)) / 825.0;
 				fallingEval = std::clamp(fallingEval, 0.5, 1.5);
 
 				// If the bestMove is stable over several iterations, reduce time accordingly
