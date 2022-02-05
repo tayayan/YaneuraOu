@@ -41,3 +41,8 @@ Simplifies bestMoveChanges from LMR
 Tweak time management
 303-185-266
 多分弱くはなっていない、採用
+
+
+Assign extra bonus for previous move that caused a fail low more often
+267-150-240
+多分弱くはなっていない、採用

@@ -2828,7 +2828,17 @@ namespace {
 		else if (  (depth >= 3 || PvNode)
 				&& !priorCapture)
 			// continuation historyのupdate。PvNodeかcutNodeならボーナスを2倍する。
-			update_continuation_histories(ss - 1, /*pos.piece_on(prevSq)*/prevPc, prevSq, stat_bonus(depth) * (1 + (PvNode || cutNode)));
+		
+		{
+			//Assign extra bonus if current node is PvNode or cutNode
+			//or fail low was really bad
+			bool extraBonus =    PvNode
+							  || cutNode
+							  || bestValue < alpha - 94 * depth;
+
+			update_continuation_histories(ss - 1, /*pos.piece_on(prevSq)*/prevPc, prevSq, stat_bonus(depth) * (1 + extraBonus));
+		}
+			
 
 		// 将棋ではtable probe使っていないのでmaxValue関係ない。
 		// ゆえにStockfishのここのコードは不要。(maxValueでcapする必要がない)
