@@ -1169,9 +1169,8 @@ void Thread::search()
 			{
 				// 1つしか合法手がない(one reply)であるだとか、利用できる時間を使いきっているだとか、
 
-				double fallingEval = (142 + 6 * (mainThread->bestPreviousScore - bestValue)
-										  + 6 * (mainThread->bestPreviousAverageScore - bestValue)
-										  + 6 * (mainThread->iterValue[iterIdx] - bestValue)) / 825.0;
+				double fallingEval = (142 + 12 * (mainThread->bestPreviousAverageScore - bestValue)
+										  +  6 * (mainThread->iterValue[iterIdx] - bestValue)) / 825.0;
 				fallingEval = std::clamp(fallingEval, 0.5, 1.5);
 
 				// If the bestMove is stable over several iterations, reduce time accordingly

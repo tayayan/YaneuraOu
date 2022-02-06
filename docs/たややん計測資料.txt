@@ -58,3 +58,7 @@ Adjust singular extension depth restriction
 有意差なし、今後検討する
 
 
+Simplify falling eval time factor.
+270-174-318
+良くない可能性？要検討
+
