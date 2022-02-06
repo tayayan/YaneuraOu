@@ -1341,8 +1341,7 @@ namespace {
 		// ttCapture			: 置換表の指し手がcaptureする指し手であるか
 		// pvExact				: PvNodeで置換表にhitして、しかもBOUND_EXACT
 		// singularQuietLMR     : QuietLMRのsingular延長をするフラグ
-		bool captureOrPawnPromotion, doFullDepthSearch, moveCountPruning,
-			 ttCapture, singularQuietLMR;
+		bool captureOrPawnPromotion, doFullDepthSearch, moveCountPruning, ttCapture;
 
 		// moveによって移動させる駒
 		Piece movedPiece;
@@ -2114,7 +2113,7 @@ namespace {
 
 		value = bestValue;
 
-		singularQuietLMR = moveCountPruning = false;
+		moveCountPruning = false;
 
 		// Indicate PvNodes that will probably fail low if the node was searched
 		// at a depth equal or greater than the current depth, and the result of this search was a fail low.
@@ -2343,8 +2342,7 @@ namespace {
 				if (value < singularBeta)
 				{
 					extension = 1;
-					singularQuietLMR = !ttCapture;
-
+					
 #if 0
 					// singular extentionが生じた回数の統計を取ってみる。
 					dbg_hit_on(extension == 1);
@@ -2515,11 +2513,6 @@ namespace {
 				// Decrease reduction if opponent's move count is high (~1 Elo)
 				// 相手の(1手前の)move countが大きければ、reductionを減らす。
 				if ((ss - 1)->moveCount > 13)
-					r--;
-
-				// Decrease reduction if ttMove has been singularly extended (~1 Elo)
-				// 置換表の指し手でsingular延長がなされたなら、reductionを減らす。
-				if (singularQuietLMR)
 					r--;
 
 				// Increase reduction for cut nodes (~3 Elo)

@@ -62,3 +62,7 @@ Simplify falling eval time factor.
 270-174-318
 良くない可能性？要検討
 
+
+Simplify away singularQuietLMR
+582-398-567
+有意差なし、とりあえず採用
