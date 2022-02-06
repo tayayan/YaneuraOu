@@ -72,3 +72,9 @@ Remove lowPly history
 322-181-353
 良くないかも、要検討
 
+
+Adjust reductions based on current node delta and root delta
+232-117-207
+多分弱くはなっていない。採用
+
+

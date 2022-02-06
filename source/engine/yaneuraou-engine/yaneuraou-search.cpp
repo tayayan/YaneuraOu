@@ -200,9 +200,9 @@ namespace {
 	// 悪化していく局面なので深く読んでも仕方ないからreduction量を心もち増やす。
 	// rangeReductionは、staticEvalとchildのeval(value)の差が一貫して低い時にreduction量を増やしたいので、
 	// そのためのフラグ。(これがtrueだとreduction量が1増える)
-	Depth reduction(bool i, Depth d, int mn, bool rangeReduction) {
+	Depth reduction(bool i, Depth d, int mn, bool rangeReduction, Value delta, Value rootDelta) {
 		int r = Reductions[d] * Reductions[mn];
-		return (r + PARAM_REDUCTION_ALPHA /* 534*/ ) / 1024 + (!i && r > PARAM_REDUCTION_BETA /*904*/) + rangeReduction;
+		return (r + PARAM_REDUCTION_ALPHA /*1358*/ - int(delta) * 1024 / int(rootDelta)) / 1024 + (!i && r > PARAM_REDUCTION_BETA /*904*/) + rangeReduction;
 	}
 
 	// 【計測資料 29.】　Move CountベースのFutiliy Pruning、Stockfish 9と10での比較
@@ -2197,6 +2197,8 @@ namespace {
 			// Calculate new depth for this move
 			// 今回の指し手に関して新しいdepth(残り探索深さ)を計算する。
 			newDepth = depth - 1;
+			
+			Value delta = beta - alpha;
 
 			if (  !rootNode
 				// 【計測資料 7.】 浅い深さでの枝刈りを行なうときに王手がかかっていないことを条件に入れる/入れない
@@ -2209,7 +2211,7 @@ namespace {
 
 				// Reduced depth of the next LMR search
 				// 次のLMR探索における軽減された深さ
-				int lmrDepth = std::max(newDepth - reduction(improving, depth, moveCount, rangeReduction > 2), 0);
+				int lmrDepth = std::max(newDepth - reduction(improving, depth, moveCount, rangeReduction > 2, delta, thisThread->rootDelta), 0);
 
 				if (   captureOrPawnPromotion
 					|| givesCheck)
@@ -2238,8 +2240,6 @@ namespace {
 						continue;
 
 					history += thisThread->mainHistory[us][from_to(move)];
-					
-					lmrDepth = std::max(0, lmrDepth - (beta - alpha < thisThread->rootDelta / 4));
 					
 					// Futility pruning: parent node (~5 Elo)
 					// 親nodeの時点で子nodeを展開する前にfutilityの対象となりそうなら枝刈りしてしまう。
@@ -2461,15 +2461,14 @@ namespace {
 					|| (cutNode && (ss-1)->moveCount > 1)))
 			{
 				// Reduction量
-				Depth r = reduction(improving, depth, moveCount, rangeReduction > 2);
+				Depth r = reduction(improving, depth, moveCount, rangeReduction > 2, delta, thisThread->rootDelta);
 
 				// Decrease reduction at some PvNodes (~2 Elo)
 				// PvNodeでのreductionを減らす。
 				// bestMoveCountはこのnodeでαを更新した回数。
 				// これが少ないうちは良い指し手が見つかっていないわけだからreductionすべきではない。
 				if (   PvNode
-					&& bestMoveCount <= 3
-					&& beta - alpha >= thisThread->rootDelta / 4)
+					&& bestMoveCount <= 3)
 					r--;
 
 				// Decrease reduction if position is or has been on the PV
@@ -2479,11 +2478,6 @@ namespace {
 				if (   ss->ttPv
 					&& !likelyFailLow)
 					r -= 2 ;
-
-				// Increase reduction at non-PV nodes
-				// non-PVではreductionを増やす。
-				if (!PvNode)
-					r++;
 
 				// Decrease reduction if opponent's move count is high (~5 Elo)
 				// 相手の指し手(1手前の指し手)のmove countが高い場合、reduction量を減らす。
