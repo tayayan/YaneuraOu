@@ -81,3 +81,10 @@ Adjust reductions based on current node delta and root delta
 Reintroduce futility pruning for captures
 152-73-112
 強くなっていそう。採用
+
+
+Remove Capture Extension
+355-223-375
+有意差はないけど、微妙。要検討。
+
+

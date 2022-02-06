@@ -2368,13 +2368,6 @@ namespace {
 
 			}
 
-			// Capture extensions for PvNodes and cutNodes
-			// 捕獲する指し手とcutNodeでの延長。
-			else if (   (PvNode || cutNode)
-					 && captureOrPawnPromotion
-					 && moveCount != 1)
-				extension = 1;
-
 			// Check extensions
 			// 王手延長
 
