@@ -66,3 +66,9 @@ Simplify falling eval time factor.
 Simplify away singularQuietLMR
 582-398-567
 有意差なし、とりあえず採用
+
+
+Remove lowPly history
+322-181-353
+良くないかも、要検討
+

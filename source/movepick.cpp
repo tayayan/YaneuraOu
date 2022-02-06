@@ -109,10 +109,13 @@ void partial_insertion_sort(ExtMove* begin, ExtMove* end, int limit) {
 // 指し手オーダリング器
 
 // 通常探索から呼び出されるとき用。
-MovePicker::MovePicker(const Position& p, Move ttm, Depth d, const ButterflyHistory* mh, const LowPlyHistory* lp,
-	const CapturePieceToHistory* cph , const PieceToHistory** ch, Move cm, const Move* killers,int pl)
-	: pos(p), mainHistory(mh), lowPlyHistory(lp),captureHistory(cph) , continuationHistory(ch),
-	ttMove(ttm), refutations{ { killers[0], 0 },{ killers[1], 0 },{ cm, 0 } }, depth(d), ply(pl)
+MovePicker::MovePicker(const Position& p, Move ttm, Depth d, const ButterflyHistory* mh,
+															 const CapturePieceToHistory* cph,
+															 const PieceToHistory** ch,
+															 Move cm,
+															 const Move* killers)
+			: pos(p), mainHistory(mh), captureHistory(cph) , continuationHistory(ch),
+			  ttMove(ttm), refutations{ { killers[0], 0 },{ killers[1], 0 },{ cm, 0 } }, depth(d)
 {
 	// 通常探索から呼び出されているので残り深さはゼロより大きい。
 	ASSERT_LV3(d > 0);
@@ -129,8 +132,11 @@ MovePicker::MovePicker(const Position& p, Move ttm, Depth d, const ButterflyHist
 // 静止探索から呼び出される時用。
 // rs : recapture square
 MovePicker::MovePicker(const Position& p, Move ttm, Depth d, const ButterflyHistory* mh,
-						const CapturePieceToHistory* cph, const PieceToHistory** ch, Square rs)
-	: pos(p), mainHistory(mh), captureHistory(cph) , continuationHistory(ch) , ttMove(ttm), recaptureSquare(rs), depth(d) {
+															 const CapturePieceToHistory* cph,
+															 const PieceToHistory** ch,
+															 Square rs)
+			: pos(p), mainHistory(mh), captureHistory(cph) , continuationHistory(ch) , ttMove(ttm), recaptureSquare(rs), depth(d) 
+{
 
 	// 静止探索から呼び出されているので残り深さはゼロ以下。
 	ASSERT_LV3(d <= 0);
@@ -148,7 +154,8 @@ MovePicker::MovePicker(const Position& p, Move ttm, Depth d, const ButterflyHist
 // 通常探索時にProbCutの処理から呼び出されるの専用
 // th = 枝刈りのしきい値
 MovePicker::MovePicker(const Position& p, Move ttm, Value th , const CapturePieceToHistory* cph)
-			: pos(p), captureHistory(cph) , ttMove(ttm),threshold(th) {
+			: pos(p), captureHistory(cph) , ttMove(ttm),threshold(th) 
+{
 
 	ASSERT_LV3(!pos.in_check());
 
@@ -199,8 +206,7 @@ void MovePicker::score()
 					+ 2 * (*continuationHistory[0])[movedSq][movedPiece]
 					+     (*continuationHistory[1])[movedSq][movedPiece]
 					+     (*continuationHistory[3])[movedSq][movedPiece]
-					+     (*continuationHistory[5])[movedSq][movedPiece]
-					+ (ply < MAX_LPH ? 6 * (*lowPlyHistory)[ply][from_to(m)] : 0);
+					+     (*continuationHistory[5])[movedSq][movedPiece];
 #else
 
 			// パラメーターの調整フレームワークを利用するために、値を16倍して最適値を探す。
@@ -208,8 +214,7 @@ void MovePicker::score()
 				+ MOVE_PICKER_Q_PARAM1 * (*continuationHistory[0])[movedSq][movedPiece]
 				+ MOVE_PICKER_Q_PARAM2 * (*continuationHistory[1])[movedSq][movedPiece]
 				+ MOVE_PICKER_Q_PARAM3 * (*continuationHistory[3])[movedSq][movedPiece]
-				+ MOVE_PICKER_Q_PARAM4 * (*continuationHistory[5])[movedSq][movedPiece]
-				+ MOVE_PICKER_Q_PARAM5 * (ply < MAX_LPH ? std::min(4, depth / 3) * (*lowPlyHistory)[ply][from_to(m)] : 0);
+				+ MOVE_PICKER_Q_PARAM4 * (*continuationHistory[5])[movedSq][movedPiece];
 #endif
 		}
 		else // Type == EVASIONS
