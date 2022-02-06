@@ -2221,10 +2221,21 @@ namespace {
 						&& lmrDepth < 1
 						&& captureHistory[to_sq(move)][movedPiece][type_of(pos.piece_on(to_sq(move)))] < 0)
 						continue;
+						
+					// Futility pruning for captures
+					if (   !pos.empty(to_sq(move))
+						&& !givesCheck
+						&& !PvNode
+						&& lmrDepth < 6
+						&& !ss->inCheck
+						&& ss->staticEval + 342 + 238 * lmrDepth + (Value)CapturePieceValue[pos.piece_on(to_sq(move))]
+						+ (is_promote(move) ? (Value)ProDiffPieceValue[pos.piece_on(from_sq(move))] : VALUE_ZERO) 
+						+ captureHistory[to_sq(move)][movedPiece][type_of(pos.piece_on(to_sq(move)))] / 8 < alpha)
+						continue;
 
 					// SEE based pruning
 					if (!pos.see_ge(move, - Value(PARAM_LMR_SEE_MARGIN1 /*218*/) * depth)) // (~25 Elo)
-						continue;
+						continue;					
 				}
 				else
 				{
