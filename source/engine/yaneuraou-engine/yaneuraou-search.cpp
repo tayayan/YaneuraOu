@@ -3138,10 +3138,11 @@ namespace {
 		// 取り合いの指し手だけ生成する
 		// searchから呼び出された場合、直前の指し手がMOVE_NULLであることがありうるが、
 		// 静止探索の1つ目の深さではrecaptureを生成しないならこれは問題とならない。
+		Square prevSq = to_sq((ss-1)->currentMove);
 		MovePicker mp(pos, ttMove, depth, &thisThread->mainHistory,
 										  &thisThread->captureHistory,
 										  contHist,
-										  to_sq((ss - 1)->currentMove));
+										  prevSq);
 
 		// このあとnodeを展開していくので、evaluate()の差分計算ができないと速度面で損をするから、
 		// evaluate()を呼び出していないなら呼び出しておく。
@@ -3180,6 +3181,7 @@ namespace {
 
 			if (    bestValue > VALUE_TB_LOSS_IN_MAX_PLY
 				&& !givesCheck
+				&&  to_sq(move) != prevSq
 				&&  futilityBase > -VALUE_KNOWN_WIN
 			//	&&  type_of(move) != PROMOTION) // TODO : これ入れたほうがいいのか？
 				)
