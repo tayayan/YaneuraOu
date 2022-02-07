@@ -88,3 +88,6 @@ Remove Capture Extension
 有意差はないけど、微妙。要検討。
 
 
+Remove Capture history pruning
+1874-1156-2152
+弱くなってそう。要検討
