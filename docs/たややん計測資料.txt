@@ -112,3 +112,7 @@ Adjust pruning constants
 274-135-269
 有意差なし、要調整
 
+
+Simplify limiting extensions.
+332-172-322
+有意差なし、とりあえず採用

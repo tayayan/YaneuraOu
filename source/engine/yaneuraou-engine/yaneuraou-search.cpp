@@ -249,31 +249,6 @@ namespace {
 		return VALUE_DRAW + Value(2 * (thisThread->nodes & 1) - 1);
 	}
 
-	// Check if the current thread is in a search explosion
-	// 現在の探索が組合せ爆発を起こしているかをチェックする。
-	ExplosionState search_explosion(Thread* thisThread) {
-
-		uint64_t nodesNow = thisThread->nodes;
-		bool explosive =   thisThread->doubleExtensionAverage[WHITE].is_greater(2, 100)
-						|| thisThread->doubleExtensionAverage[BLACK].is_greater(2, 100);
-
-		if (explosive)
-			thisThread->nodesLastExplosive = nodesNow;
-		else
-			thisThread->nodesLastNormal = nodesNow;
-
-		if (   explosive
-			&& thisThread->state == EXPLOSION_NONE
-			&& nodesNow - thisThread->nodesLastNormal > 6000000)
-			thisThread->state = MUST_CALM_DOWN;
-
-		if (   thisThread->state == MUST_CALM_DOWN
-			&& nodesNow - thisThread->nodesLastExplosive > 6000000)
-			thisThread->state = EXPLOSION_NONE;
-
-		return thisThread->state;
-	}
-
 	// Skill structure is used to implement strength limit. If we have an uci_elo then
 	// we convert it to a suitable fractional skill level using anchoring to CCRL Elo
 	// (goldfish 1.13 = 2000) and a fit through Ordo derived Elo for match (TC 60+0.6)
@@ -763,13 +738,6 @@ void search_thread_init(Thread* th, Stack* ss , Move pv[])
 	//   移動平均を用いる統計情報の初期化
 	// ---------------------
 
-	// 二重延長率
-	th->doubleExtensionAverage[WHITE].set(0, 100);  // initialize the running average at 0%
-	th->doubleExtensionAverage[BLACK].set(0, 100);  // initialize the running average at 0%
-
-	th->nodesLastExplosive	= th->nodes;			// th->nodes == 0のはずだが…。
-	th->nodesLastNormal		= th->nodes;
-	th->state				= EXPLOSION_NONE;
 
 	// 千日手の時の動的なcontempt。これ、やねうら王では使わないことにする。
 	//th->trend = VALUE_ZERO;
@@ -1247,17 +1215,6 @@ namespace {
 	template <NodeType nodeType>
 	Value search(Position& pos, Stack* ss, Value alpha, Value beta, Depth depth, bool cutNode)
 	{
-		Thread* thisThread = pos.this_thread();
-
-		// -----------------------
-		// Step 0. Limit search explosion
-		// -----------------------
-
-		// 探索が組合せ爆発しているかのチェック
-		if (   ss->ply > 10
-			&& search_explosion(thisThread) == MUST_CALM_DOWN
-			&& depth > (ss - 1)->depth)
-			depth = (ss - 1)->depth;
 
 		// -----------------------
 		//     nodeの種類
@@ -1355,7 +1312,7 @@ namespace {
 		// -----------------------
 
 		//     nodeの初期化
-
+		Thread* thisThread = pos.this_thread();
 		ss->inCheck		= pos.checkers();
 		priorCapture	= pos.captured_piece();
 		Color us		= pos.side_to_move();
@@ -1464,10 +1421,6 @@ namespace {
 		// 前の指し手で移動させた先の升目
 		// TODO : null moveのときにprevSq == 1 == SQ_12になるのどうなのか…。
 		Square prevSq			= to_sq((ss - 1)->currentMove);
-
-		// Update the running average statistics for double extensions
-		// 二重延長に関する移動平均の統計情報を更新する。
-		thisThread->doubleExtensionAverage[us].update(ss->depth > (ss - 1)->depth);
 
 		// Initialize statScore to zero for the grandchildren of the current position.
 		// So statScore is shared between all grandchildren and only the first grandchild
@@ -2296,100 +2249,101 @@ namespace {
 			// いわば、0.5手延長が自己対戦で(のみ)強くなるのの拡張。
 			// そう考えるとベストな指し手のスコアと2番目にベストな指し手のスコアとの差に応じて1手延長するのが正しいのだが、
 			// 2番目にベストな指し手のスコアを小さなコストで求めることは出来ないので…。
-
-			// singular延長をするnodeであるか。
-			if (   !rootNode
-				&&  depth >= PARAM_SINGULAR_EXTENSION_DEPTH/*6*/ + 2 * (PvNode && tte->is_pv())
-				&&  move == ttMove
-				&& !excludedMove // 再帰的なsingular延長を除外する。
-			/*  &&  ttValue != VALUE_NONE Already implicit in the next condition */
-				&&  abs(ttValue) < VALUE_KNOWN_WIN // 詰み絡みのスコアはsingular extensionはしない。(Stockfish 10～)
-				&& (tte->bound() & BOUND_LOWER)
-				&&  tte->depth() >= depth - 3)
+			// We take care to not overdo to avoid search getting stuck.
+			if (ss->ply < thisThread->rootDepth * 2)
+			{
+				if (   !rootNode
+					&&  depth >= PARAM_SINGULAR_EXTENSION_DEPTH/*6*/ + 2 * (PvNode && tte->is_pv())
+					&&  move == ttMove
+					&& !excludedMove // 再帰的なsingular延長を除外する。
+				/*  &&  ttValue != VALUE_NONE Already implicit in the next condition */
+					&&  abs(ttValue) < VALUE_KNOWN_WIN // 詰み絡みのスコアはsingular extensionはしない。(Stockfish 10～)
+					&& (tte->bound() & BOUND_LOWER)
+					&&  tte->depth() >= depth - 3)
 				// このnodeについてある程度調べたことが置換表によって証明されている。(ttMove == moveなのでttMove != MOVE_NONE)
 				// (そうでないとsingularの指し手以外に他の有望な指し手がないかどうかを調べるために
 				// null window searchするときに大きなコストを伴いかねないから。)
-			{
+				{
 				// このmargin値は評価関数の性質に合わせて調整されるべき。
 				Value singularBeta = ttValue - PARAM_SINGULAR_MARGIN/* == 3 * 256 */* depth / 256;
 				Depth singularDepth = (depth - 1) / 2;
 
-				// move(ttMove)の指し手を以下のsearch()での探索から除外
+					// move(ttMove)の指し手を以下のsearch()での探索から除外
+					ss->excludedMove = move;
+					// 局面はdo_move()で進めずにこのnodeから浅い探索深さで探索しなおす。
+					// 浅いdepthでnull windowなので、すぐに探索は終わるはず。
+					value = search<NonPV>(pos, ss, singularBeta - 1, singularBeta, singularDepth, cutNode);
+					ss->excludedMove = MOVE_NONE;
 
-				ss->excludedMove = move;
-				// 局面はdo_move()で進めずにこのnodeから浅い探索深さで探索しなおす。
-				// 浅いdepthでnull windowなので、すぐに探索は終わるはず。
-				value = search<NonPV>(pos, ss, singularBeta - 1, singularBeta, singularDepth, cutNode);
-				ss->excludedMove = MOVE_NONE;
-
-				// 置換表の指し手以外がすべてfail lowしているならsingular延長確定。
-				if (value < singularBeta)
-				{
-					extension = 1;
+					// 置換表の指し手以外がすべてfail lowしているならsingular延長確定。
+					if (value < singularBeta)
+					{
+						extension = 1;
 					
 #if 0
 					// singular extentionが生じた回数の統計を取ってみる。
 					dbg_hit_on(extension == 1);
 #endif
 
-					// Avoid search explosion by limiting the number of double extensions
-					// 2重延長を制限することで探索の組合せ爆発を回避する。
-					if (   !PvNode
-						&& value < singularBeta - 75
-						&& ss->doubleExtensions <= 6)
-						extension = 2;
+						// Avoid search explosion by limiting the number of double extensions
+						// 2重延長を制限することで探索の組合せ爆発を回避する。
+						if (   !PvNode
+							&& value < singularBeta - 75
+							&& ss->doubleExtensions <= 6)
+							extension = 2;
+					}
+
+					// Multi-cut pruning
+					// Our ttMove is assumed to fail high, and now we failed high also on a reduced
+					// search without the ttMove. So we assume this expected Cut-node is not singular,
+					// 今回のttMoveはfail highであろうし、そのttMoveなしでdepthを減らした探索においてもfail highした。
+					// that multiple moves fail high, and we can prune the whole subtree by returning
+					// a soft bound.
+					// だから、この期待されるCut-nodeはsingularではなく、複数の指し手でfail highすると考えられる。
+					// よって、hard beta boundを返すことでこの部分木全体を枝刈りする。
+					else if (singularBeta >= beta)
+						return singularBeta;
+
+					// If the eval of ttMove is greater than beta, we reduce it (negative extension)
+					// ttMoveのevalがbetaより大きいなら、extensionを減らす(負の延長)
+
+					else if (ttValue >= beta)
+						extension = -2;
+
 				}
+			
+				// Check extensions
+				// 王手延長
 
-				// Multi-cut pruning
-				// Our ttMove is assumed to fail high, and now we failed high also on a reduced
-				// search without the ttMove. So we assume this expected Cut-node is not singular,
-				// 今回のttMoveはfail highであろうし、そのttMoveなしでdepthを減らした探索においてもfail highした。
-				// that multiple moves fail high, and we can prune the whole subtree by returning
-				// a soft bound.
-				// だから、この期待されるCut-nodeはsingularではなく、複数の指し手でfail highすると考えられる。
-				// よって、hard beta boundを返すことでこの部分木全体を枝刈りする。
-				else if (singularBeta >= beta)
-					return singularBeta;
-
-				// If the eval of ttMove is greater than beta, we reduce it (negative extension)
-				// ttMoveのevalがbetaより大きいなら、extensionを減らす(負の延長)
-
-				else if (ttValue >= beta)
-					extension = -2;
-
-			}
-
-			// Check extensions
-			// 王手延長
-
-			//  注意 : 王手延長に関して、Stockfishのコード、ここに持ってこないこと!!
-			// →　将棋では王手はわりと続くのでStockfishの現在のコードは明らかにやりすぎ。
+				//  注意 : 王手延長に関して、Stockfishのコード、ここに持ってこないこと!!
+				// →　将棋では王手はわりと続くのでStockfishの現在のコードは明らかにやりすぎ。
 
 #if 0
-			// 静的評価に基づく王手延長。
-			else if (   givesCheck
-					 && depth > 6
-					 && abs(ss->staticEval) > 100)
-				extension = 1;
+				// 静的評価に基づく王手延長。
+				else if (   givesCheck
+						&& depth > 6
+						&& abs(ss->staticEval) > 100)
+					extension = 1;
 #endif
 
-			// →　王手延長は、開き王手と駒得しながらの王手に限定する。(こっちにした方が、+R20ぐらい強い。)
-			// 　　上の前2つの条件も悪くはないだろうから入れておく。(入れたほうが+R10ぐらい強い)
-			else if (givesCheck
-				&& depth > 6
-				&& abs(ss->staticEval) > 100
-				&& (pos.is_discovery_check_on_king(~us, move) || pos.see_ge(move)))
-				extension = 1;
+				// →　王手延長は、開き王手と駒得しながらの王手に限定する。(こっちにした方が、+R20ぐらい強い。)
+				// 　　上の前2つの条件も悪くはないだろうから入れておく。(入れたほうが+R10ぐらい強い)
+				else if (givesCheck
+					&& depth > 6
+					&& abs(ss->staticEval) > 100
+					&& (pos.is_discovery_check_on_king(~us, move) || pos.see_ge(move)))
+					extension = 1;
 
-			// Quiet ttMove extensions
-			// PV nodeで quietなttは良い指し手のはずだから延長するというもの。
+				// Quiet ttMove extensions
+				// PV nodeで quietなttは良い指し手のはずだから延長するというもの。
 
-			else if (   PvNode
-				&& move == ttMove
-				&& move == ss->killers[0]
-				&& (*contHist[0])[to_sq(move)][movedPiece] >= 10000)
-				extension = 1;
-
+				else if (   PvNode
+					&& move == ttMove
+					&& move == ss->killers[0]
+					&& (*contHist[0])[to_sq(move)][movedPiece] >= 10000)
+					extension = 1;
+			}
+			
 			// -----------------------
 			//   1手進める前の枝刈り
 			// -----------------------
