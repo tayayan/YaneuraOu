@@ -107,3 +107,8 @@ Simplify away rangeReduction
 183-90-173
 有意差なし、とりあえず採用
 
+
+Adjust pruning constants
+274-135-269
+有意差なし、要調整
+

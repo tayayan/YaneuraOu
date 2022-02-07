@@ -2225,7 +2225,7 @@ namespace {
 						continue;
 
 					// SEE based pruning
-					if (!pos.see_ge(move, - Value(PARAM_LMR_SEE_MARGIN1 /*218*/) * depth)) // (~25 Elo)
+					if (!pos.see_ge(move, - Value(PARAM_LMR_SEE_MARGIN1 /*217*/) * depth)) // (~25 Elo)
 						continue;					
 				}
 				else
@@ -2233,12 +2233,12 @@ namespace {
 					int history =   (*contHist[0])[to_sq(move)][movedPiece]
 								  + (*contHist[1])[to_sq(move)][movedPiece]
 								  + (*contHist[3])[to_sq(move)][movedPiece];
+					// contHist[][]はStockfishと逆順なので注意。
 					// // Continuation history based pruning (~20 Elo)
 					// Continuation historyに基づいた枝刈り(historyの値が悪いものに関してはskip) : ~20 Elo
 
 					if (lmrDepth < PARAM_PRUNING_BY_HISTORY_DEPTH/*5*/
-						&& history < -3000 * depth + 3000)
-						// contHist[][]はStockfishと逆順なので注意。
+						&& history < -3875 * (depth - 1))						
 						continue;
 
 					history += thisThread->mainHistory[us][from_to(move)];
@@ -2251,7 +2251,7 @@ namespace {
 
 					if (   !ss->inCheck
 						&& lmrDepth < PARAM_FUTILITY_AT_PARENT_NODE_DEPTH/*8*/
-						&& ss->staticEval + PARAM_FUTILITY_AT_PARENT_NODE_MARGIN1/*142*/ + PARAM_FUTILITY_MARGIN_BETA/*139*/ * lmrDepth + history / 64 <= alpha)
+						&& ss->staticEval + PARAM_FUTILITY_AT_PARENT_NODE_MARGIN1/*138*/ + PARAM_FUTILITY_MARGIN_BETA/*137*/ * lmrDepth + history / 64 <= alpha)
 						continue;
 
 					// ※　このLMRまわり、棋力に極めて重大な影響があるので枝刈りを入れるかどうかを含めて慎重に調整すべき。
