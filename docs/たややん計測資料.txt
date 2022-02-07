@@ -101,3 +101,9 @@ Don't direct prune a move if it's a retake
 Smooth out doDeeperSearch
 257-144-284
 有意差ないけど微妙。要検討
+
+
+Simplify away rangeReduction
+183-90-173
+有意差なし、とりあえず採用
+

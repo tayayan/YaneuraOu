@@ -200,9 +200,9 @@ namespace {
 	// 悪化していく局面なので深く読んでも仕方ないからreduction量を心もち増やす。
 	// rangeReductionは、staticEvalとchildのeval(value)の差が一貫して低い時にreduction量を増やしたいので、
 	// そのためのフラグ。(これがtrueだとreduction量が1増える)
-	Depth reduction(bool i, Depth d, int mn, bool rangeReduction, Value delta, Value rootDelta) {
+	Depth reduction(bool i, Depth d, int mn, Value delta, Value rootDelta) {
 		int r = Reductions[d] * Reductions[mn];
-		return (r + PARAM_REDUCTION_ALPHA /*1358*/ - int(delta) * 1024 / int(rootDelta)) / 1024 + (!i && r > PARAM_REDUCTION_BETA /*904*/) + rangeReduction;
+		return (r + PARAM_REDUCTION_ALPHA /*1358*/ - int(delta) * 1024 / int(rootDelta)) / 1024 + (!i && r > PARAM_REDUCTION_BETA /*904*/);
 	}
 
 	// 【計測資料 29.】　Move CountベースのFutiliy Pruning、Stockfish 9と10での比較
@@ -2048,9 +2048,6 @@ namespace {
 		// このタイミングで呼び出したほうが高速化するようなので呼び出す。
 		Eval::evaluate_with_no_return(pos);
 
-		// staticEvalとchildのeval(value)の差が一貫して低い時にreduction量を増やしたいのでそのためのカウンター。
-		int rangeReduction = 0;
-
 		// -----------------------
 		// Step 11. A small Probcut idea, when we are in check
 		// -----------------------
@@ -2211,7 +2208,7 @@ namespace {
 
 				// Reduced depth of the next LMR search
 				// 次のLMR探索における軽減された深さ
-				int lmrDepth = std::max(newDepth - reduction(improving, depth, moveCount, rangeReduction > 2, delta, thisThread->rootDelta), 0);
+				int lmrDepth = std::max(newDepth - reduction(improving, depth, moveCount, delta, thisThread->rootDelta), 0);
 
 				if (   captureOrPawnPromotion
 					|| givesCheck)
@@ -2459,7 +2456,7 @@ namespace {
 					|| (cutNode && (ss-1)->moveCount > 1)))
 			{
 				// Reduction量
-				Depth r = reduction(improving, depth, moveCount, rangeReduction > 2, delta, thisThread->rootDelta);
+				Depth r = reduction(improving, depth, moveCount, delta, thisThread->rootDelta);
 
 				// Decrease reduction at some PvNodes (~2 Elo)
 				// PvNodeでのreductionを減らす。
@@ -2538,11 +2535,6 @@ namespace {
 				// ここにその他の枝刈り、何か入れるべき(かも)
 				//
 
-				// Range reductions (~3 Elo)
-				//
-				// staticEvalとchildのeval(value)の差が一貫して低い時にreduction量を増やす。
-				if (ss->staticEval - value < 30 && depth > 7)
-					rangeReduction++;
 
 				// If the son is reduced and fails high it will be re-searched at full depth
 				// 上の探索によりalphaを更新しそうだが、いい加減な探索なので信頼できない。まともな探索で検証しなおす。
