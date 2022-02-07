@@ -97,3 +97,7 @@ Don't direct prune a move if it's a retake
 507-289-457
 悪くなさそう。採用
 
+
+Smooth out doDeeperSearch
+257-144-284
+有意差ないけど微妙。要検討

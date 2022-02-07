@@ -2548,7 +2548,7 @@ namespace {
 				// 上の探索によりalphaを更新しそうだが、いい加減な探索なので信頼できない。まともな探索で検証しなおす。
 
 				doFullDepthSearch = value > alpha && d < newDepth;
-				doDeeperSearch = value > alpha + 88;
+				doDeeperSearch = value > (alpha + 62 + 20 * (newDepth - d));
 				didLMR = true;
 			}
 			else
