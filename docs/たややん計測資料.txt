@@ -123,3 +123,8 @@ Scale child node futility pruning with previous move history.
 弱くはなさそう。採用
 
 
+Do stats updates after LMR for captures
+378-245-340
+有意差なし、とりあえず採用
+
+
