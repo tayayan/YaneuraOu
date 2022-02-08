@@ -3093,6 +3093,8 @@ namespace {
 										  &thisThread->captureHistory,
 										  contHist,
 										  prevSq);
+										  
+		int quietCheckEvasions = 0;
 
 		// このあとnodeを展開していくので、evaluate()の差分計算ができないと速度面で損をするから、
 		// evaluate()を呼び出していないなら呼び出しておく。
@@ -3216,6 +3218,15 @@ namespace {
 				&& (*contHist[0])[to_sq(move)][pos.moved_piece_after(move)] < CounterMovePruneThreshold
 				&& (*contHist[1])[to_sq(move)][pos.moved_piece_after(move)] < CounterMovePruneThreshold)
 				continue;
+				
+			// movecount pruning for quiet check evasions
+			if (  bestValue > VALUE_TB_LOSS_IN_MAX_PLY
+				&& quietCheckEvasions > 1
+				&& !captureOrPawnPromotion
+				&& ss->inCheck)
+				continue;
+
+			quietCheckEvasions += !captureOrPawnPromotion && ss->inCheck;
 
 			// Make and search the move
 			// 1手動かして、再帰的にqsearch()を呼ぶ

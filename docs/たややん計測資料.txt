@@ -128,3 +128,6 @@ Do stats updates after LMR for captures
 有意差なし、とりあえず採用
 
 
+Introduce movecount pruning for quiet check evasions in qsearch
+248-130-243
+有意差なし、とりあえず採用
