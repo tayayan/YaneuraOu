@@ -1765,8 +1765,18 @@ namespace {
 		// improvingフラグは、improvementをbool化したもの。
 		improving = improvement > 0;
 
+		// Step 7. Razoring.
+		// If eval is really low check with qsearch if it can exceed alpha, if it can't,
+		// return a fail low.
+		if (!PvNode && depth <= 6 && eval < alpha - 400 - 300 * depth * depth)
+		{
+			value = qsearch<NonPV>(pos, ss, alpha - 1, alpha);
+			if (value < alpha)
+				return value;
+		}
+		
 		// -----------------------
-		// Step 7. Futility pruning: child node (~50 Elo).
+		// Step 8. Futility pruning: child node (~50 Elo).
 		//         The depth condition is important for mate finding.
 		// -----------------------
 
@@ -1800,7 +1810,7 @@ namespace {
 		// cf. Simplify futility pruning return value : https://github.com/official-stockfish/Stockfish/commit/f799610d4bb48bc280ea7f58cd5f78ab21028bf5
 
 		// -----------------------
-		// Step 8. Null move search with verification search (~40 Elo)
+		// Step 9. Null move search with verification search (~40 Elo)
 		// -----------------------
 
 		//  検証用の探索つきのnull move探索。PV nodeではやらない。
@@ -1871,7 +1881,7 @@ namespace {
 		}
 
 		// -----------------------
-		// Step 9. ProbCut (~4 Elo)
+		// Step 10. ProbCut (~4 Elo)
 		// -----------------------
 
 		// probCutに使うbeta値。
@@ -1974,7 +1984,7 @@ namespace {
 		}
 
 		// -----------------------
-		// Step 10. If the position is not in TT, decrease depth by 2 or 1 depending on node type
+		// Step 11. If the position is not in TT, decrease depth by 2 or 1 depending on node type
 		// -----------------------
 
 		// 局面がTTになかったのなら、探索深さを2下げる。
@@ -2003,7 +2013,7 @@ namespace {
 		Eval::evaluate_with_no_return(pos);
 
 		// -----------------------
-		// Step 11. A small Probcut idea, when we are in check
+		// Step 12. A small Probcut idea, when we are in check
 		// -----------------------
 
 		probCutBeta = beta + 409;
@@ -2058,7 +2068,7 @@ namespace {
 
 
 		// -----------------------
-		// Step 12. Loop through all pseudo-legal moves until no moves remain
+		// Step 13. Loop through all pseudo-legal moves until no moves remain
 		//			or a beta cutoff occurs.
 		// -----------------------
 
@@ -2140,7 +2150,7 @@ namespace {
 			givesCheck = pos.gives_check(move);
 
 			// -----------------------
-			// Step 13. Pruning at shallow depth (~200 Elo). Depth conditions are important for mate finding.
+			// Step 14. Pruning at shallow depth (~200 Elo). Depth conditions are important for mate finding.
 			// -----------------------
 
 			// 浅い深さでの枝刈り
@@ -2222,7 +2232,7 @@ namespace {
 			}
 
 			// -----------------------
-			// Step 14. Extensions (~75 Elo)
+			// Step 15. Extensions (~75 Elo)
 			// -----------------------
 
 			// singular延長と王手延長。
@@ -2381,7 +2391,7 @@ namespace {
 																	  [movedPiece            ];
 
 			// -----------------------
-			// Step 15. Make the move
+			// Step 16. Make the move
 			// -----------------------
 
 			// 指し手で1手進める
@@ -2390,7 +2400,7 @@ namespace {
 			bool doDeeperSearch = false;
 
 			// -----------------------
-			// Step 16. Late moves reduction / extension (LMR, ~200 Elo)
+			// Step 17. Late moves reduction / extension (LMR, ~200 Elo)
 			// -----------------------
 			// depthを減らした探索。LMR(Late Move Reduction)
 
@@ -2508,7 +2518,7 @@ namespace {
 
 
 			// -----------------------
-			// Step 17. Full depth search when LMR is skipped or fails high
+			// Step 18. Full depth search when LMR is skipped or fails high
 			// -----------------------
 
 			// Full depth search。LMRがskipされたか、LMRにおいてfail highを起こしたなら元の探索深さで探索する。
@@ -2549,7 +2559,7 @@ namespace {
 			}
 
 			// -----------------------
-			// Step 18. Undo move
+			// Step 19. Undo move
 			// -----------------------
 
 			//      1手戻す
@@ -2559,7 +2569,7 @@ namespace {
 			ASSERT_LV3(-VALUE_INFINITE < value && value < VALUE_INFINITE);
 
 			// -----------------------
-			// Step 19. Check for a new best move
+			// Step 20. Check for a new best move
 			// -----------------------
 
 
@@ -2699,7 +2709,7 @@ namespace {
 		// end of while
 
 		// -----------------------
-		// Step 20. Check for mate and stalemate
+		// Step 21. Check for mate and stalemate
 		// -----------------------
 
 		// All legal moves have been searched and if there are no legal moves, it
