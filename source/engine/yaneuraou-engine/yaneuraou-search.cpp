@@ -1782,7 +1782,8 @@ namespace {
 
 		if (!ss->ttPv
 			&&  depth < PARAM_FUTILITY_RETURN_DEPTH/*9*/
-			&&  eval - futility_margin(depth, improving) >= beta
+			&&  eval - futility_margin(depth, improving) - (ss-1)->statScore / 256 >= beta
+			&&  eval >= beta
 			&&  eval < VALUE_KNOWN_WIN + 700)
 			// 詰み絡み等だとmate distance pruningで枝刈りされるはずで、ここでは枝刈りしない。
 			// Stockfishでは、上の最後の条件は、

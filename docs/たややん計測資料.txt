@@ -114,5 +114,12 @@ Adjust pruning constants
 
 
 Simplify limiting extensions.
-332-172-322
+493-274-453
 有意差なし、とりあえず採用
+
+
+Scale child node futility pruning with previous move history.
+167-68-143
+弱くはなさそう。採用
+
+
