@@ -136,3 +136,7 @@ Introduce movecount pruning for quiet check evasions in qsearch
 Reintroduce razoring
 1324-797-1301
 有意差なし、とりあえず採用
+
+
+Big search tuning
+FV_SCALEの最適値も含め、後で検証
