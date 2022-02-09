@@ -3199,9 +3199,9 @@ namespace {
 				continue;
 
 
-			// TODO : prefetchは、入れると遅くなりそうだが、many coreだと違うかも。
+			// TODO : prefetchは、入れると遅くなりそうだが、many coreだと違うかも。→NPSは減少しない(TR3990, 128Threadで検証)
 			// Speculative prefetch as early as possible
-			//prefetch(TT.first_entry(pos.key_after(move)));
+			prefetch(TT.first_entry(pos.key_after(move)));
 
 			// -----------------------
 			//     局面を1手進める
