@@ -32,19 +32,19 @@
 // 深さに比例したfutility pruning
 // 元の値 = 171 , step = 20
 // [PARAM] min:100,max:300,step:10,interval:1,time_rate:1,fixed
-PARAM_DEFINE PARAM_FUTILITY_MARGIN_ALPHA1 = 171;
+PARAM_DEFINE PARAM_FUTILITY_MARGIN_ALPHA1 = 160;
 
 // 
 
 // 元の値 = 137 , step = 20
 // [PARAM] min:100,max:240,step:5,interval:1,time_rate:1,fixed
-PARAM_DEFINE PARAM_FUTILITY_MARGIN_BETA = 137;
+PARAM_DEFINE PARAM_FUTILITY_MARGIN_BETA = 160;
 
 
 // 静止探索でのfutility pruning
 // 元の値 = 127 , step = 20
 // [PARAM] min:50,max:200,step:10,interval:1,time_rate:1,fixed
-PARAM_DEFINE PARAM_FUTILITY_MARGIN_QUIET = 127;
+PARAM_DEFINE PARAM_FUTILITY_MARGIN_QUIET = 105;
 
 // futility pruningの適用depth。
 // この制限自体が要らない可能性がある。→　そうでもなかった。
@@ -72,9 +72,9 @@ PARAM_DEFINE PARAM_FUTILITY_AT_PARENT_NODE_GAMMA1 = 25;
 PARAM_DEFINE PARAM_FUTILITY_AT_PARENT_NODE_GAMMA2 = 29;
 
 // lmrのときのseeの値。
-// 元の値 = 217 ,step = 40
+// 元の値 = 200 ,step = 40
 // [PARAM] min:0,max:300,step:20,interval:1,time_rate:1,fixed
-PARAM_DEFINE PARAM_LMR_SEE_MARGIN1 = 217;
+PARAM_DEFINE PARAM_LMR_SEE_MARGIN1 = 220;
 
 
 // Reductionの計算式に出てくる定数
@@ -110,7 +110,7 @@ PARAM_DEFINE PARAM_NULL_MOVE_DYNAMIC_BETA = 82;
 PARAM_DEFINE PARAM_NULL_MOVE_DYNAMIC_GAMMA = 225;
 
 
-// 元の値 = 23767 , step = 8000
+// 元の値 = 13706 , step = 8000
 // [PARAM] min:0,max:50000,step:500,interval:1,time_rate:1,fixed
 PARAM_DEFINE PARAM_NULL_MOVE_MARGIN0 = 13706;
 
