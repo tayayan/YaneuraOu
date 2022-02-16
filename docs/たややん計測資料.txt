@@ -141,3 +141,8 @@ Reintroduce razoring
 Big search tuning
 436-267-412
 FV_SCALEの最適値も含め、後で検証
+
+
+Big search tuning 2
+1683-1207-1606
+有意差なし、とりあえず採用

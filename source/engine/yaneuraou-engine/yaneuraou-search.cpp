@@ -186,7 +186,7 @@ namespace {
 
 	// depth(残り探索深さ)に応じたfutility margin。
 	Value futility_margin(Depth d, bool improving) {
-		return Value(PARAM_FUTILITY_MARGIN_ALPHA1/*171*/ * (d - improving));
+		return Value(PARAM_FUTILITY_MARGIN_ALPHA1/*147*/ * (d - improving));
 	}
 
 	// 【計測資料 30.】　Reductionのコード、Stockfish 9と10での比較
@@ -202,7 +202,7 @@ namespace {
 	// そのためのフラグ。(これがtrueだとreduction量が1増える)
 	Depth reduction(bool i, Depth d, int mn, Value delta, Value rootDelta) {
 		int r = Reductions[d] * Reductions[mn];
-		return (r + PARAM_REDUCTION_ALPHA /*1575*/ - int(delta) * 1024 / int(rootDelta)) / 1024 + (!i && r > PARAM_REDUCTION_BETA /*1011*/);
+		return (r + PARAM_REDUCTION_ALPHA /*1627*/ - int(delta) * 1024 / int(rootDelta)) / 1024 + (!i && r > PARAM_REDUCTION_BETA /*992*/);
 	}
 
 	// 【計測資料 29.】　Move CountベースのFutiliy Pruning、Stockfish 9と10での比較
@@ -236,7 +236,7 @@ namespace {
 		//return std::min((6 * d + 229) * d - 215 , 2000);
 		
 		// [Stockfish14.1 2022/02]
-		return std::min((7 * d + 254) * d - 206 , 1990);
+		return std::min((8 * d + 281) * d - 241 , 1949);
 
 	}
 
@@ -349,7 +349,7 @@ void Search::init()
 	// 0.05とか変更するだけで勝率えらく変わる
 
 	for (int i = 1; i < MAX_MOVES; ++i)
-		Reductions[i] = int(21.5 * std::log(i));
+		Reductions[i] = int(21.14 * std::log(i));
 
 	// Stockfish11.1で現在のスレッド数設定に依存する項が追加された。(以下コード)
 	// このため、スレッド数が確定するisreadyタイミングで初期化する必要があるが、
@@ -930,8 +930,8 @@ void Thread::search()
 				// やねうら王のKPPT(Apery WCSC26)ではStockfishのまま(18付近)がベスト。
 				// もっと精度の高い評価関数を用意すべき。
 				// この値はStockfish10では20に変更された。
-				// Stockfish 12(NNUEを導入した)では17に変更された。→2022/02、16に変更。
-				delta = Value(PARAM_ASPIRATION_SEARCH_DELTA) + int(prev) * prev / 16384;
+				// Stockfish 12(NNUEを導入した)では17に変更された。→2022/02、19に変更。
+				delta = Value(PARAM_ASPIRATION_SEARCH_DELTA) + int(prev) * prev / 18321;
 
 				alpha = std::max(prev - delta, -VALUE_INFINITE);
 				beta  = std::min(prev + delta,  VALUE_INFINITE);
@@ -1034,7 +1034,7 @@ void Thread::search()
 					break;
 
 				// delta を等比級数的に大きくしていく
-				delta += delta / 4 + 3;
+				delta += delta / 4 + 2;
 
 				ASSERT_LV3(alpha >= -VALUE_INFINITE && beta <= VALUE_INFINITE);
 			}
@@ -1136,15 +1136,15 @@ void Thread::search()
 			{
 				// 1つしか合法手がない(one reply)であるだとか、利用できる時間を使いきっているだとか、
 
-				double fallingEval = (87 + 12 * (mainThread->bestPreviousAverageScore - bestValue)
-										 +  6 * (mainThread->iterValue[iterIdx] - bestValue)) / 777.20;
+				double fallingEval = (66 + 12 * (mainThread->bestPreviousAverageScore - bestValue)
+										 +  6 * (mainThread->iterValue[iterIdx] - bestValue)) / 809.70;
 				fallingEval = std::clamp(fallingEval, 0.5, 1.5);
 
 				// If the bestMove is stable over several iterations, reduce time accordingly
 				// もしbestMoveが何度かのiterationにおいて安定しているならば、思考時間もそれに応じて減らす
 
-				timeReduction = lastBestMoveDepth + 8 < completedDepth ? 1.70 : 0.91;
-				double reduction = (1.59 + mainThread->previousTimeReduction) / (2.33 * timeReduction);
+				timeReduction = lastBestMoveDepth + 8 < completedDepth ? 1.73 : 0.94;
+				double reduction = (1.66 + mainThread->previousTimeReduction) / (2.35 * timeReduction);
 
 				// rootでのbestmoveの不安定性。
 				// bestmoveが不安定であるなら思考時間を増やしたほうが良い。
@@ -1181,7 +1181,7 @@ void Thread::search()
 				// depthが増えて行っていないなら、同じ深さで再度探索する。
 				else if (Threads.increaseDepth
 					&& !mainThread->ponder
-					&&  Time.elapsed() > totalTime * 0.55)
+					&&  Time.elapsed() > totalTime * 0.49)
 					Threads.increaseDepth = false;
 				else
 					Threads.increaseDepth = true;
@@ -1761,7 +1761,7 @@ namespace {
 
 		improvement =	  (ss-2)->staticEval != VALUE_NONE ? ss->staticEval - (ss-2)->staticEval
 						: (ss-4)->staticEval != VALUE_NONE ? ss->staticEval - (ss-4)->staticEval
-						:                                    200;
+						:                                    184;
 
 		// ※　VALUE_NONE == 32002なのでこれより大きなstaticEvalの値であることはない。
 
@@ -1771,7 +1771,7 @@ namespace {
 		// Step 7. Razoring.
 		// If eval is really low check with qsearch if it can exceed alpha, if it can't,
 		// return a fail low.
-		if (!PvNode && depth <= 6 && eval < alpha - 400 - 300 * depth * depth)
+		if (!PvNode && depth <= 6 && eval < alpha - 486 - 314 * depth * depth)
 		{
 			value = qsearch<NonPV>(pos, ss, alpha - 1, alpha);
 			if (value < alpha)
@@ -1821,12 +1821,12 @@ namespace {
 		//  evalの見積りがbetaを超えているので1手パスしてもbetaは超えそう。
 		if (!PvNode
 			&& (ss - 1)->currentMove != MOVE_NULL
-			&& (ss - 1)->statScore < PARAM_NULL_MOVE_MARGIN0/*13706*/
+			&& (ss - 1)->statScore < PARAM_NULL_MOVE_MARGIN0/*15075*/
 			&&  eval >= beta
 			&&  eval >= ss->staticEval
-			&&  ss->staticEval >= beta - PARAM_NULL_MOVE_MARGIN1 /*19*/ * depth
-								- improvement / PARAM_NULL_MOVE_MARGIN3 /* 15 */
-								+ PARAM_NULL_MOVE_MARGIN4 /*200*/
+			&&  ss->staticEval >= beta - PARAM_NULL_MOVE_MARGIN1 /*18*/ * depth
+								- improvement / PARAM_NULL_MOVE_MARGIN3 /* 19 */
+								+ PARAM_NULL_MOVE_MARGIN4 /*215*/
 
 			&& !excludedMove
 		//	&&  pos.non_pawn_material(us)  // これ終盤かどうかを意味する。将棋でもこれに相当する条件が必要かも。
@@ -1837,7 +1837,7 @@ namespace {
 			ASSERT_LV3(eval - beta >= 0);
 
 			// 残り探索深さと評価値によるnull moveの深さを動的に減らす
-			Depth R = std::min(int(eval - beta) / PARAM_NULL_MOVE_DYNAMIC_GAMMA/*205*/, 3) +
+			Depth R = std::min(int(eval - beta) / PARAM_NULL_MOVE_DYNAMIC_GAMMA/*184*/, 4) +
 					  (PARAM_NULL_MOVE_DYNAMIC_ALPHA/*1024*/ + PARAM_NULL_MOVE_DYNAMIC_BETA/*85*/ * depth) / 256;
 
 			ss->currentMove = MOVE_NULL;
@@ -1888,7 +1888,7 @@ namespace {
 		// -----------------------
 
 		// probCutに使うbeta値。
-		probCutBeta = beta + PARAM_PROBCUT_MARGIN1/*229*/ - PARAM_PROBCUT_MARGIN2/*47*/ * improving;
+		probCutBeta = beta + PARAM_PROBCUT_MARGIN1/*204*/ - PARAM_PROBCUT_MARGIN2/*52*/ * improving;
 
 		// ProbCut(王手のときはスキップする)
 
@@ -1899,7 +1899,7 @@ namespace {
 		// 探索深さを減らしてざっくり見てもbetaを非常に上回る値を返すようなら、このnodeをほぼ安全に枝刈りすることが出来る。
 
 		if (   !PvNode
-			&&  depth > PARAM_PROBCUT_DEPTH/*3*/
+			&&  depth > PARAM_PROBCUT_DEPTH/*4*/
 			&&  abs(beta) < VALUE_TB_WIN_IN_MAX_PLY
 			
 			// if value from transposition table is lower than probCutBeta, don't attempt probCut
@@ -1993,12 +1993,12 @@ namespace {
 		//   探索が完了しているほうが助かるため)
 		
 		if (   PvNode
-			&& depth >= 4
+			&& depth >= 3
 			&& !ttMove)
 			depth -= 2;
 
 		if (   cutNode
-			&& depth >= 7
+			&& depth >= 8
 			&& !ttMove)
 			depth--;
 
@@ -2019,7 +2019,7 @@ namespace {
 		probCutBeta = beta + 401;
 		if (   ss->inCheck
 			&& !PvNode
-			&& depth >= 4
+			&& depth >= 2
 			&& ttCapture
 			&& (tte->bound() & BOUND_LOWER)
 			&& tte->depth() >= depth - 3
@@ -2187,15 +2187,15 @@ namespace {
 					if (   !pos.empty(to_sq(move))
 						&& !givesCheck
 						&& !PvNode
-						&& lmrDepth < 6
+						&& lmrDepth < 7
 						&& !ss->inCheck
-						&& ss->staticEval + 392 + 207 * lmrDepth + (Value)CapturePieceValue[pos.piece_on(to_sq(move))]
+						&& ss->staticEval + 424 + 138 * lmrDepth + (Value)CapturePieceValue[pos.piece_on(to_sq(move))]
 						+ (is_promote(move) ? (Value)ProDiffPieceValue[pos.piece_on(from_sq(move))] : VALUE_ZERO) 
 						+ captureHistory[to_sq(move)][movedPiece][type_of(pos.piece_on(to_sq(move)))] / 8 < alpha)
 						continue;
 
 					// SEE based pruning
-					if (!pos.see_ge(move, - Value(PARAM_LMR_SEE_MARGIN1 /*200*/) * depth)) // (~25 Elo)
+					if (!pos.see_ge(move, - Value(PARAM_LMR_SEE_MARGIN1 /*214*/) * depth)) // (~25 Elo)
 						continue;					
 				}
 				else
@@ -2221,7 +2221,7 @@ namespace {
 
 					if (   !ss->inCheck
 						&& lmrDepth < PARAM_FUTILITY_AT_PARENT_NODE_DEPTH/*11*/
-						&& ss->staticEval + PARAM_FUTILITY_AT_PARENT_NODE_MARGIN1/*131*/ + PARAM_FUTILITY_MARGIN_BETA/*137*/ * lmrDepth + history / 64 <= alpha)
+						&& ss->staticEval + PARAM_FUTILITY_AT_PARENT_NODE_MARGIN1/*147*/ + PARAM_FUTILITY_MARGIN_BETA/*125*/ * lmrDepth + history / 64 <= alpha)
 						continue;
 
 					// ※　このLMRまわり、棋力に極めて重大な影響があるので枝刈りを入れるかどうかを含めて慎重に調整すべき。
@@ -2231,8 +2231,8 @@ namespace {
 
 					// 【計測資料 20.】SEEが負の指し手を枝刈りする/しない
 
-					if (!pos.see_ge(move, Value( - PARAM_FUTILITY_AT_PARENT_NODE_GAMMA1/*25*/ * lmrDepth * lmrDepth
-						- PARAM_FUTILITY_AT_PARENT_NODE_GAMMA2/*29*/ * lmrDepth )))
+					if (!pos.see_ge(move, Value( - PARAM_FUTILITY_AT_PARENT_NODE_GAMMA1/*23*/ * lmrDepth * lmrDepth
+						- PARAM_FUTILITY_AT_PARENT_NODE_GAMMA2/*31*/ * lmrDepth )))
 						continue;
 				}
 			}
@@ -2282,7 +2282,7 @@ namespace {
 				// null window searchするときに大きなコストを伴いかねないから。)
 				{
 				// このmargin値は評価関数の性質に合わせて調整されるべき。
-				Value singularBeta = ttValue - PARAM_SINGULAR_MARGIN/* == 3 * 256 */* depth / 256;
+				Value singularBeta = ttValue - PARAM_SINGULAR_MARGIN/* == 4 * 256 */* depth / 256;
 				Depth singularDepth = (depth - 1) / 2;
 
 					// move(ttMove)の指し手を以下のsearch()での探索から除外
@@ -2305,8 +2305,8 @@ namespace {
 						// Avoid search explosion by limiting the number of double extensions
 						// 2重延長を制限することで探索の組合せ爆発を回避する。
 						if (   !PvNode
-							&& value < singularBeta - 71
-							&& ss->doubleExtensions <= 6)
+							&& value < singularBeta - 52
+							&& ss->doubleExtensions <= 8)
 							extension = 2;
 					}
 
@@ -2328,36 +2328,22 @@ namespace {
 						extension = -2;
 
 				}
-			
+				
 				// Check extensions
 				// 王手延長
 
-				//  注意 : 王手延長に関して、Stockfishのコード、ここに持ってこないこと!!
-				// →　将棋では王手はわりと続くのでStockfishの現在のコードは明らかにやりすぎ。
-
-#if 0
-				// 静的評価に基づく王手延長。
-				else if (   givesCheck
-						&& depth > 7
-						&& abs(ss->staticEval) > 128)
-					extension = 1;
-#endif
-
-				// →　王手延長は、開き王手と駒得しながらの王手に限定する。(こっちにした方が、+R20ぐらい強い。)
-				// 　　上の前2つの条件も悪くはないだろうから入れておく。(入れたほうが+R10ぐらい強い)
 				else if (givesCheck
-					&& depth > 7
-					&& abs(ss->staticEval) > 128
-					&& (pos.is_discovery_check_on_king(~us, move) || pos.see_ge(move)))
+					&& depth > 8
+					&& abs(ss->staticEval) > 81)
 					extension = 1;
-
+				
 				// Quiet ttMove extensions
 				// PV nodeで quietなttは良い指し手のはずだから延長するというもの。
 
 				else if (   PvNode
 					&& move == ttMove
 					&& move == ss->killers[0]
-					&& (*contHist[0])[to_sq(move)][movedPiece] >= 8932)
+					&& (*contHist[0])[to_sq(move)][movedPiece] >= 7546)
 					extension = 1;
 			}
 			
@@ -2434,7 +2420,7 @@ namespace {
 				// bestMoveCountはこのnodeでαを更新した回数。
 				// これが少ないうちは良い指し手が見つかっていないわけだからreductionすべきではない。
 				if (   PvNode
-					&& bestMoveCount <= 4)
+					&& bestMoveCount <= 3)
 					r--;
 
 				// Decrease reduction if position is or has been on the PV
@@ -2479,11 +2465,11 @@ namespace {
 								+ (*contHist[0])[to_sq(move)][movedPiece]
 								+ (*contHist[1])[to_sq(move)][movedPiece]
 								+ (*contHist[3])[to_sq(move)][movedPiece]
-								- PARAM_REDUCTION_BY_HISTORY/*4142*/; // 修正項
+								- PARAM_REDUCTION_BY_HISTORY/*4123*/; // 修正項
 
 
 				// Decrease/increase reduction for moves with a good/bad history (~30 Elo)
-				r -= ss->statScore / 15328;
+				r -= ss->statScore / 17417;
 
 				// In general we want to cap the LMR depth search at newDepth. But if reductions
 				// are really negative and movecount is low, we allow this move to be searched
@@ -2491,8 +2477,8 @@ namespace {
 
 				int deeper =  r >= -1					? 0
 							: moveCount <= 5			? 2
-							: PvNode && depth > 4       ? 1
-							: cutNode && moveCount <= 5 ? 1
+							: PvNode && depth > 3       ? 1
+							: cutNode && moveCount <= 7 ? 1
 							:							  0;
 
 				// depth >= 3なのでqsearchは呼ばれないし、かつ、
@@ -2511,7 +2497,7 @@ namespace {
 				// 上の探索によりalphaを更新しそうだが、いい加減な探索なので信頼できない。まともな探索で検証しなおす。
 
 				doFullDepthSearch = value > alpha && d < newDepth;
-				doDeeperSearch = value > (alpha + 80 + 20 * (newDepth - d));
+				doDeeperSearch = value > (alpha + 76 + 11 * (newDepth - d));
 				didLMR = true;
 			}
 			else
@@ -2541,7 +2527,7 @@ namespace {
 											  : -stat_bonus(newDepth);
 											  
 					if (captureOrPawnPromotion)
-						bonus /= 5;
+						bonus /= 6;
 					
 					update_continuation_histories(ss, movedPiece, to_sq(move), bonus);
 				}
@@ -2759,7 +2745,7 @@ namespace {
 		// fail lowを引き起こした前nodeでのcounter moveに対してボーナスを加点する。
 		// 【計測資料 15.】search()でfail lowしているときにhistoryのupdateを行なう条件
 
-		else if (  (depth >= 3 || PvNode)
+		else if (  (depth >= 4 || PvNode)
 				&& !priorCapture)
 			// continuation historyのupdate。PvNodeかcutNodeならボーナスを2倍する。
 		
@@ -2768,7 +2754,7 @@ namespace {
 			//or fail low was really bad
 			bool extraBonus =    PvNode
 							  || cutNode
-							  || bestValue < alpha - 99 * depth;
+							  || bestValue < alpha - 71 * depth;
 
 			update_continuation_histories(ss - 1, /*pos.piece_on(prevSq)*/prevPc, prevSq, stat_bonus(depth) * (1 + extraBonus));
 		}
@@ -3085,7 +3071,7 @@ namespace {
 
 			// futilityの基準となる値をbestValueにmargin値を加算したものとして、
 			// これを下回るようであれば枝刈りする。
-			futilityBase = bestValue + PARAM_FUTILITY_MARGIN_QUIET /*127*/;
+			futilityBase = bestValue + PARAM_FUTILITY_MARGIN_QUIET /*139*/;
 		}
 
 		// -----------------------
