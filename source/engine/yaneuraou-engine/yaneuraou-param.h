@@ -84,7 +84,7 @@ PARAM_DEFINE PARAM_REDUCTION_ALPHA = 1627;
 
 // Reductionの計算式に出てくる定数
 // このパラメーター怖くて調整できない。
-// 元の値 = 1011 , step = 128
+// 元の値 = 992 , step = 128
 // [PARAM] min:600,max:1500,step:128,interval:1,time_rate:1,fixed
 PARAM_DEFINE PARAM_REDUCTION_BETA = 992;
 
@@ -114,7 +114,7 @@ PARAM_DEFINE PARAM_NULL_MOVE_DYNAMIC_GAMMA = 184;
 // [PARAM] min:0,max:50000,step:500,interval:1,time_rate:1,fixed
 PARAM_DEFINE PARAM_NULL_MOVE_MARGIN0 = 15075;
 
-// 元の値 = 19 , step 2
+// 元の値 = 18 , step 2
 // [PARAM] min:10,max:60,step:2,interval:1,time_rate:1,fixed
 PARAM_DEFINE PARAM_NULL_MOVE_MARGIN1 = 18;
 
@@ -122,11 +122,11 @@ PARAM_DEFINE PARAM_NULL_MOVE_MARGIN1 = 18;
 // [PARAM] min:10,max:60,step:2,interval:1,time_rate:1,fixed
 PARAM_DEFINE PARAM_NULL_MOVE_MARGIN2 = 22;
 
-// 元の値 = 15 , step = 4
+// 元の値 = 19 , step = 4
 // [PARAM] min:5,max:40,step:2,interval:1,time_rate:1,fixed
 PARAM_DEFINE PARAM_NULL_MOVE_MARGIN3 = 19;
 
-// 元の値 = 200 , step = 50
+// 元の値 = 215 , step = 50
 // [PARAM] min:0,max:400,step:30,interval:1,time_rate:1,fixed
 PARAM_DEFINE PARAM_NULL_MOVE_MARGIN4 = 215;
 
