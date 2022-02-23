@@ -146,3 +146,8 @@ FV_SCALEの最適値も含め、後で検証
 Big search tuning 2
 1683-1207-1606
 有意差なし、とりあえず採用
+
+
+Adjust usage of LMR for 2nd move in move ordering
+3178-2376-3288
+微妙かも。様子見
