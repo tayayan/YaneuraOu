@@ -59,9 +59,9 @@ class AffineTransform {
 	bool ReadParameters(std::istream& stream) {
 		if (!previous_layer_.ReadParameters(stream))
 			return false;
-		for (std::size_t i = 0; i < kOutputDimensions; ++i)
+		for (IndexType i = 0; i < kOutputDimensions; ++i)
 			biases_[i] = read_little_endian<BiasType>(stream);
-		for (std::size_t i = 0; i < kOutputDimensions * kPaddedInputDimensions; ++i)
+		for (IndexType i = 0; i < kOutputDimensions * kPaddedInputDimensions; ++i)
 			weights_[i] = read_little_endian<WeightType>(stream);
 		return !stream.fail();
 	}
