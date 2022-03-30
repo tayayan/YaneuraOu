@@ -2407,7 +2407,7 @@ namespace {
 			// alpha値を更新しそうなら(fail highが起きたら)、full depthで探索しなおす。
 
 			if (    depth >= 2
-				&&  moveCount > 1 + (PvNode && ss->ply <= 1)
+				&&  moveCount > 1 + rootNode
 				&& (   !ss->ttPv
 					|| !captureOrPawnPromotion
 					|| (cutNode && (ss-1)->moveCount > 1)))
