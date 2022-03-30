@@ -156,3 +156,8 @@ Adjust usage of LMR for 2nd move in move ordering
 Clean up and simplify some nnue code
 1957-1451-1947
 よくわからない。とりあえず採用
+
+
+Decrease reductions in Lmr for some Pv nodes
+2935-660-2823
+弱くなってはいなさそう。採用

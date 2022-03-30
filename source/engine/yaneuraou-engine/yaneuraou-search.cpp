@@ -2458,6 +2458,10 @@ namespace {
 
 				if (ttCapture)
 					r++;
+				// Decrease reduction at PvNodes if bestvalue
+				// is vastly different from static evaluation
+				if (PvNode && !ss->inCheck && abs(ss->staticEval - bestValue) > 250)
+					r--;
 
 				// 【計測資料 11.】statScoreの計算でcontHist[3]も調べるかどうか。
 				// contHist[5]も/2とかで入れたほうが良いのでは…。誤差か…？
