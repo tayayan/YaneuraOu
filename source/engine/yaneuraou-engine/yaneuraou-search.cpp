@@ -2248,15 +2248,15 @@ namespace {
 				}
 				else
 				{
-					// // Continuation history based pruning (~20 Elo)
+					// Continuation history based pruning (~20 Elo)
 					// Continuation historyに基づいた枝刈り(historyの値が悪いものに関してはskip) : ~20 Elo
 
 					int history = (*contHist[0])[to_sq(move)][movedPiece]
 								+ (*contHist[1])[to_sq(move)][movedPiece]
 								+ (*contHist[3])[to_sq(move)][movedPiece];
 
-					if (lmrDepth < PARAM_PRUNING_BY_HISTORY_DEPTH/*5*/
-						&& history < -3875 * (depth - 1))
+					if (   lmrDepth < 6
+						&& history < -3875 * depth)
 						// contHist[][]はStockfishと逆順なので注意。
 						continue;
 
