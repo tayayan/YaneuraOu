@@ -2767,7 +2767,15 @@ namespace {
 						// PvNodeでalpha値を更新した。
 						// このとき相手からの詰みがあるかどうかを調べるなどしたほうが良いなら
 						// ここに書くべし。
+						
+						// Reduce other moves if we have found at least one score improvement
+						if (   depth > 2
+							&& depth < 7
+							&& beta  <  VALUE_KNOWN_WIN
+							&& alpha > -VALUE_KNOWN_WIN)
+							depth -= 1;
 
+						ASSERT_LV3(depth > 0);
 					}
 					else
 					{
