@@ -1551,7 +1551,7 @@ namespace {
 
 		if (  !PvNode                  // PV nodeでは置換表の指し手では枝刈りしない(PV nodeはごくわずかしかないので..)
 			&& ss->ttHit               // 置換表の指し手がhitして
-			&& tte->depth() > depth - ((int)thisThread->id() & 0x1) - (tte->bound() == BOUND_EXACT)
+			&& tte->depth() > depth - (tte->bound() == BOUND_EXACT)
 			&& ttValue != VALUE_NONE   // (VALUE_NONEだとすると他スレッドからTTEntryが読みだす直前に破壊された可能性がある)
 			&& (ttValue >= beta ? (tte->bound() & BOUND_LOWER)
 				                : (tte->bound() & BOUND_UPPER))
