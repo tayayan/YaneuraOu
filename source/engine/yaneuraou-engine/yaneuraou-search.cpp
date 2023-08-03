@@ -2741,10 +2741,11 @@ namespace {
 						// ここに書くべし。
 						
 						// Reduce other moves if we have found at least one score improvement
+						// Reduce more for depth > 3 and depth < 12 (~1 Elo)
 						if (   depth > 1
 							&& beta  <  VALUE_KNOWN_WIN
 							&& alpha > -VALUE_KNOWN_WIN)
-							depth -= 1;
+							depth -= depth > 3 && depth < 12 ? 2 : 1;
 
 						ASSERT_LV3(depth > 0);
 					}
