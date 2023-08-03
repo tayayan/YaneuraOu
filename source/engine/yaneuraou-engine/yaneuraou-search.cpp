@@ -2064,7 +2064,6 @@ namespace {
 		probCutBeta = beta + 481;
 		if (   ss->inCheck
 			&& !PvNode
-			&& depth >= 2
 			&& ttCapture
 			&& (tte->bound() & BOUND_LOWER)
 			&& tte->depth() >= depth - 3
