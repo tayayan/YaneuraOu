@@ -1226,11 +1226,9 @@ void Thread::search()
 						Time.search_end = std::max(Time.round_up(Time.elapsed_from_ponderhit()), Time.minimum());
 					}
 				}
-				// 前回からdepthが増えたかのチェック。
-				// depthが増えて行っていないなら、同じ深さで再度探索する。
-				else if (Threads.increaseDepth
-					&& !mainThread->ponder
-					&&  Time.elapsed() > totalTime * 0.58)
+
+				else if (!mainThread->ponder
+						 && Time.elapsed() > totalTime * 0.58)
 					Threads.increaseDepth = false;
 				else
 					Threads.increaseDepth = true;
