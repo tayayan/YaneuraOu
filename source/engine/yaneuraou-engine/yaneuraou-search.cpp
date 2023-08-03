@@ -2379,7 +2379,10 @@ namespace {
 						if (!PvNode
 							&& value < singularBeta - 26
 							&& ss->doubleExtensions <= 8)
+						{
 							extension = 2;
+							depth += depth < 12;
+						}
 					}
 
 					// Multi-cut pruning
