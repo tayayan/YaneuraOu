@@ -2754,7 +2754,7 @@ namespace {
 
 						// また、non PVであるなら探索窓の幅が0なのでalphaを更新した時点で、value >= betaが言えて、
 						// beta cutである。
-						ss->cutoffCnt++;
+						ss->cutoffCnt += 1 + !ttMove;
 						ASSERT_LV3(value >= beta); // Fail high
 						break;
 					}
