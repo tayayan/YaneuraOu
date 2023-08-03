@@ -2247,8 +2247,7 @@ namespace {
 #endif
 
 					// Futility pruning for captures (~0 Elo)
-					if (   !pos.empty(to_sq(move))
-						&& !givesCheck
+					if (   !givesCheck
 						&& !PvNode
 						&& lmrDepth < 6
 						&& !ss->inCheck
