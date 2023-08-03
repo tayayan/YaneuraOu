@@ -2215,7 +2215,7 @@ namespace {
 
 				// Reduced depth of the next LMR search
 				// 次のLMR探索における軽減された深さ
-				int lmrDepth = std::max(newDepth - r, 0);
+				int lmrDepth = newDepth - r;
 
 				if (   capture
 					|| givesCheck)
