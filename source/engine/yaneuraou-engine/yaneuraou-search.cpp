@@ -1187,8 +1187,7 @@ void Thread::search()
 
 				// rootでのbestmoveの不安定性。
 				// bestmoveが不安定であるなら思考時間を増やしたほうが良い。
-				double bestMoveInstability = 1.073 + std::max(1.0, 2.25 - 9.9 / rootDepth)
-													* totBestMoveChanges / Threads.size();
+				double bestMoveInstability = 1 + 1.7 * totBestMoveChanges / Threads.size();
 
 #if 0
 				int complexity = mainThread->complexityAverage.value();
