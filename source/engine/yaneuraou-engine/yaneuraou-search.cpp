@@ -2530,11 +2530,6 @@ namespace {
 			if ((ss + 1)->cutoffCnt > 3)
 				r++;
 			
-			// Decrease reduction if move is a killer and we have a good history
-			if (move == ss->killers[0]
-				&& (*contHist[0])[movedPiece][to_sq(move)] >= 3600)
-				r--;
-				
 			// 【計測資料 11.】statScoreの計算でcontHist[3]も調べるかどうか。
 			// contHist[5]も/2とかで入れたほうが良いのでは…。誤差か…？
 			ss->statScore = thisThread->mainHistory[from_to(move)][us]
