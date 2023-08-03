@@ -4110,7 +4110,9 @@ namespace Learner
 				int failedHighCnt = 0;
 				while (true)
 				{
-					Depth adjustedDepth = std::max(1, rootDepth - failedHighCnt);
+					// Adjust the effective depth searched, but ensuring at least one effective increment for every
+					// four searchAgain steps (see issue #2717).
+					Depth adjustedDepth = std::max(1, rootDepth - failedHighCnt - 3 * (searchAgainCounter + 1) / 4);
 					bestValue = ::search<Root>(pos, ss, alpha, beta, adjustedDepth, false);
 
 					stable_sort(rootMoves.begin() + pvIdx, rootMoves.end());
