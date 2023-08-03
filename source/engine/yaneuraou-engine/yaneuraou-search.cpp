@@ -2530,6 +2530,9 @@ namespace {
 			if ((ss + 1)->cutoffCnt > 3)
 				r++;
 			
+			else if (move == ttMove)
+				r--;
+			
 			// 【計測資料 11.】statScoreの計算でcontHist[3]も調べるかどうか。
 			// contHist[5]も/2とかで入れたほうが良いのでは…。誤差か…？
 			ss->statScore = thisThread->mainHistory[from_to(move)][us]
