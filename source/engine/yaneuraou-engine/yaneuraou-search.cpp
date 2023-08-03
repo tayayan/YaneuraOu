@@ -2589,8 +2589,7 @@ namespace {
 
 				int deeper =  r >= -1					? 0
 							: moveCount <= 4			? 2
-							: PvNode                    ? 1
-							: cutNode && moveCount <= 8 ? 1
+							: PvNode || cutNode         ? 1
 							:							  0;
 
 				// depth >= 3なのでqsearchは呼ばれないし、かつ、
