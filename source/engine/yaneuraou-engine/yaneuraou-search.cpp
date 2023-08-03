@@ -2479,7 +2479,7 @@ namespace {
 			// (fail lowしてしまうとまた探索をやりなおさないといけないので)
 			if (   ss->ttPv
 				&& !likelyFailLow)
-				r -= 2 ;
+				r -= cutNode && tte->depth() >= depth + 3 ? 3 : 2;
 
 			// Decrease reduction if opponent's move count is high (~5 Elo)
 			// 相手の指し手(1手前の指し手)のmove countが高い場合、reduction量を減らす。
