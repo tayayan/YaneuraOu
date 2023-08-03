@@ -1076,7 +1076,7 @@ void Thread::search()
 					break;
 
 				// delta を等比級数的に大きくしていく
-				delta += delta / 4 + 2;
+				delta += delta / 3;
 
 				ASSERT_LV3(alpha >= -VALUE_INFINITE && beta <= VALUE_INFINITE);
 			}
@@ -2286,8 +2286,7 @@ namespace {
 
 					// 【計測資料 20.】SEEが負の指し手を枝刈りする/しない
 
-					if (!pos.see_ge(move, Value( - PARAM_FUTILITY_AT_PARENT_NODE_GAMMA1/*25*/ * lmrDepth * lmrDepth
-						- PARAM_FUTILITY_AT_PARENT_NODE_GAMMA2/*20*/ * lmrDepth )))
+					if (!pos.see_ge(move, Value(-27 * lmrDepth * lmrDepth - 16 * lmrDepth)))
 						continue;
 				}
 			}
@@ -4122,7 +4121,7 @@ namespace Learner
 					else
 						break;
 
-					delta += delta / 4 + 2;
+					delta += delta / 3;
 					ASSERT_LV3(-VALUE_INFINITE <= alpha && beta <= VALUE_INFINITE);
 
 					// 暴走チェック
