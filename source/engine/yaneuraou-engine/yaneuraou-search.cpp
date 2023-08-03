@@ -2274,7 +2274,10 @@ namespace {
 						continue;
 
 					// mainHistory[][]もStockfishと逆順なので注意。
-					history += thisThread->mainHistory[from_to(move)][ us];
+					history += 2 * thisThread->mainHistory[from_to(move)][us];
+					
+					lmrDepth += history / 7208;
+					lmrDepth = std::max(lmrDepth, -2);
 
 					// Futility pruning: parent node (~9 Elo)
 					// 親nodeの時点で子nodeを展開する前にfutilityの対象となりそうなら枝刈りしてしまう。
@@ -2284,9 +2287,10 @@ namespace {
 
 					if (   !ss->inCheck
 						&& lmrDepth < PARAM_FUTILITY_AT_PARENT_NODE_DEPTH/*11*/
-						&& ss->staticEval + PARAM_FUTILITY_AT_PARENT_NODE_MARGIN1/*122*/ + PARAM_FUTILITY_MARGIN_BETA/*138*/ * lmrDepth
-							+ history / 60 <= alpha )
+						&& ss->staticEval + PARAM_FUTILITY_AT_PARENT_NODE_MARGIN1/*122*/ + PARAM_FUTILITY_MARGIN_BETA/*138*/ * lmrDepth <= alpha)
 						continue;
+					
+					lmrDepth = std::max(lmrDepth, 0);
 
 					// ※　このLMRまわり、棋力に極めて重大な影響があるので枝刈りを入れるかどうかを含めて慎重に調整すべき。
 
