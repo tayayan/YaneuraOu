@@ -1274,11 +1274,6 @@ namespace {
 		// root nodeであるか
 		constexpr bool rootNode = nodeType == Root;
 		
-		// 次の最大探索深さ。
-		// これを超える深さでsearch()を再帰的に呼び出さない。
-		// 延長されすぎるのを回避する。
-		const Depth maxNextDepth = rootNode ? depth : depth + 1;
-
 		// Dive into quiescence search when the depth reaches zero
 		// 残り探索深さが1手未満であるなら静止探索を呼び出す
 		if (depth <= 0)
@@ -2630,8 +2625,7 @@ namespace {
 				(ss + 1)->pv[0] = MOVE_NONE;
 
 				// full depthで探索するときはcutNodeにしてはいけない。
-				value = -search<PV>(pos, ss + 1, -beta, -alpha,
-									std::min(maxNextDepth, newDepth), false);
+				value = -search<PV>(pos, ss+1, -beta, -alpha, newDepth, false);
 			}
 
 			// -----------------------
