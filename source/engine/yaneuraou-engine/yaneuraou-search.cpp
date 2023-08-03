@@ -2738,8 +2738,7 @@ namespace {
 						// ここに書くべし。
 						
 						// Reduce other moves if we have found at least one score improvement
-						if (   depth > 2
-							&& depth < 7
+						if (   depth > 1
 							&& beta  <  VALUE_KNOWN_WIN
 							&& alpha > -VALUE_KNOWN_WIN)
 							depth -= 1;
