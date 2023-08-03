@@ -1935,7 +1935,30 @@ namespace {
 		}
 
 		// -----------------------
-		// Step 10. ProbCut (~4 Elo)
+		// Step 10. If the position is not in TT, decrease depth by 2
+		// (or by 4 if the TT entry for the current position was hit and the stored depth is greater than or equal to the current depth).
+		// -----------------------
+
+		// 局面がTTになかったのなら、探索深さを2下げる。
+		// ※　このあとも置換表にヒットしないであろうから、ここを浅めで探索しておく。
+		// (次に他のスレッドがこの局面に来たときには置換表にヒットするのでそのときにここの局面の
+		//   探索が完了しているほうが助かるため)
+		
+		// Use qsearch if depth is equal or below zero (~4 Elo)
+		if (    PvNode
+			&& !ttMove)
+			depth -= 2 + 2 * (ss->ttHit && tte->depth() >= depth);
+
+		if (depth <= 0)
+			return qsearch<PV>(pos, ss, alpha, beta);
+
+		if (    cutNode
+			&&  depth >= 8
+			&& !ttMove)
+			depth--;
+
+		// -----------------------
+		// Step 11. ProbCut (~4 Elo)
 		// -----------------------
 
 		// probCutに使うbeta値。
@@ -2018,29 +2041,6 @@ namespace {
 
 			} // end of while
 		}
-
-		// -----------------------
-		// Step 11. If the position is not in TT, decrease depth by 2
-		// (or by 4 if the TT entry for the current position was hit and the stored depth is greater than or equal to the current depth).
-		// -----------------------
-
-		// 局面がTTになかったのなら、探索深さを2下げる。
-		// ※　このあとも置換表にヒットしないであろうから、ここを浅めで探索しておく。
-		// (次に他のスレッドがこの局面に来たときには置換表にヒットするのでそのときにここの局面の
-		//   探索が完了しているほうが助かるため)
-		
-		// Use qsearch if depth is equal or below zero (~4 Elo)
-		if (    PvNode
-			&& !ttMove)
-			depth -= 2 + 2 * (ss->ttHit && tte->depth() >= depth);
-
-		if (depth <= 0)
-			return qsearch<PV>(pos, ss, alpha, beta);
-
-		if (    cutNode
-			&&  depth >= 8
-			&& !ttMove)
-			depth--;
 
 		// When in check, search starts here
 		// 王手がかかっている局面では、探索はここから始まる。
