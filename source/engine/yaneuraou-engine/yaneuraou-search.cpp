@@ -2406,8 +2406,8 @@ namespace {
 					else if (ttValue >= beta)
 						extension = -2;
 
-					// If the eval of ttMove is less than alpha and value, we reduce it (negative extension)
-					else if (ttValue <= alpha && ttValue <= value)
+					// If the eval of ttMove is less than value, we reduce it (negative extension)
+					else if (ttValue <= value)
 						extension = -1;
 				}
 
