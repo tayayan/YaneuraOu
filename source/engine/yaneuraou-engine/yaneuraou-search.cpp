@@ -699,6 +699,9 @@ SKIP_SEARCH:;
 	bestPreviousScore        = bestThread->rootMoves[0].score;
 	bestPreviousAverageScore = bestThread->rootMoves[0].averageScore;
 
+	for (Thread* th : Threads)
+		th->previousDepth = bestThread->completedDepth;
+
 	// 投了スコアが設定されていて、歩の価値を100として正規化した値がそれを下回るなら投了。
 	// ただし定跡の指し手にhitした場合などはrootMoves[0].score == -VALUE_INFINITEになっているのでそれは除外。
 	auto resign_value = (int)Options["ResignValue"];
@@ -1187,8 +1190,7 @@ void Thread::search()
 
 				// rootでのbestmoveの不安定性。
 				// bestmoveが不安定であるなら思考時間を増やしたほうが良い。
-				double bestMoveInstability = 1.073 + std::max(1.0, 2.25 - 9.9 / rootDepth)
-													* totBestMoveChanges / Threads.size();
+				double bestMoveInstability = 1 + 1.7 * totBestMoveChanges / Threads.size();
 
 #if 0
 				int complexity = mainThread->complexityAverage.value();
@@ -1463,7 +1465,8 @@ namespace {
 
 		// 2手先のkillerの初期化。
 		(ss + 2)->killers[0]	= (ss + 2)->killers[1] = MOVE_NONE;
-
+		
+		(ss + 2)->cutoffCnt    = 0;
 		// Update the running average statistics for double extensions
 		ss->doubleExtensions	= (ss - 1)->doubleExtensions;
 		ss->depth				= depth;
@@ -2355,7 +2358,7 @@ namespace {
 
 				// singular延長をするnodeであるか。
 				if (!rootNode
-					&& depth >= PARAM_SINGULAR_EXTENSION_DEPTH /* 4 */ + 2 * (PvNode && tte->is_pv())
+					&& depth >= PARAM_SINGULAR_EXTENSION_DEPTH /* 4 */ - (thisThread->previousDepth > 27) + 2 * (PvNode && tte->is_pv())
 					&& move == ttMove
 					&& !excludedMove // 再帰的なsingular延長を除外する。
 				/*  &&  ttValue != VALUE_NONE Already implicit in the next condition */
@@ -2563,6 +2566,9 @@ namespace {
 				if (PvNode)
 					r -= 1 + 15 / ( 3 + depth );
 
+				// Increase reduction if next ply has a lot of fail high else reset count to 0
+				if ((ss + 1)->cutoffCnt > 3 && !PvNode)
+					r++;
 
 				// 【計測資料 11.】statScoreの計算でcontHist[3]も調べるかどうか。
 				// contHist[5]も/2とかで入れたほうが良いのでは…。誤差か…？
@@ -2764,7 +2770,15 @@ namespace {
 						// PvNodeでalpha値を更新した。
 						// このとき相手からの詰みがあるかどうかを調べるなどしたほうが良いなら
 						// ここに書くべし。
+						
+						// Reduce other moves if we have found at least one score improvement
+						if (   depth > 2
+							&& depth < 7
+							&& beta  <  VALUE_KNOWN_WIN
+							&& alpha > -VALUE_KNOWN_WIN)
+							depth -= 1;
 
+						ASSERT_LV3(depth > 0);
 					}
 					else
 					{
@@ -2772,13 +2786,15 @@ namespace {
 
 						// また、non PVであるなら探索窓の幅が0なのでalphaを更新した時点で、value >= betaが言えて、
 						// beta cutである。
-
+						ss->cutoffCnt++;
 						ASSERT_LV3(value >= beta); // Fail high
 						break;
 					}
 				}
 			}
-
+			else
+				ss->cutoffCnt = 0;
+			
 			// If the move is worse than some previously searched move, remember it to update its stats later
 			// もしその指し手が、以前に探索されたいくつかの指し手より悪い場合は、あとで統計を取る時のために記憶しておく。
 
