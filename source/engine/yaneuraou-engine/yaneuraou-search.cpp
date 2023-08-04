@@ -1910,10 +1910,9 @@ namespace {
 
 				// Do not return unproven mate or TB scores
 				// 証明されていないmate scoreはreturnで返さない。
-				if (nullValue >= VALUE_TB_WIN_IN_MAX_PLY)
-					nullValue = beta;
+				nullValue = std::min(nullValue, VALUE_TB_WIN_IN_MAX_PLY-1);
 
-				if (thisThread->nmpMinPly || (abs(beta) < VALUE_KNOWN_WIN && depth < PARAM_NULL_MOVE_RETURN_DEPTH/*13*/ ))
+				if (thisThread->nmpMinPly || depth < PARAM_NULL_MOVE_RETURN_DEPTH/*13*/ )
 					return nullValue;
 
 				ASSERT_LV3(!thisThread->nmpMinPly); // 再帰的な検証は認めていない。
