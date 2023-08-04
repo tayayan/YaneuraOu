@@ -196,8 +196,8 @@ namespace {
 	// RazoringはStockfish12で効果がないとされてしまい除去された。
 
 	// depth(残り探索深さ)に応じたfutility margin。
-	Value futility_margin(Depth d, bool improving) {
-		return Value(PARAM_FUTILITY_MARGIN_ALPHA1/*168*/ * (d - improving));
+	Value futility_margin(Depth d, bool noTtCutNode, bool improving) {
+		return Value((PARAM_FUTILITY_MARGIN_ALPHA1/*168*/ - 40 * noTtCutNode) * (d - improving));
 	}
 
 	// 【計測資料 30.】　Reductionのコード、Stockfish 9と10での比較
@@ -1842,7 +1842,7 @@ namespace {
 
 		if (   !ss->ttPv
 			&&  depth < PARAM_FUTILITY_RETURN_DEPTH/*8*/
-			&&  eval - futility_margin(depth, improving) - (ss - 1)->statScore / 256 >= beta
+			&&  eval - futility_margin(depth, cutNode && !ss->ttHit, improving) - (ss - 1)->statScore / 256 >= beta
 			&&  eval >= beta
 			&&  eval < VALUE_KNOWN_WIN + MAX_PLY * 2 /*26305*/) // larger than VALUE_KNOWN_WIN, but smaller than TB wins.
 
