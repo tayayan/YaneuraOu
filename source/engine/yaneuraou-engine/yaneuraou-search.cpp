@@ -1879,7 +1879,8 @@ namespace {
 								/* + complexity / 28 */
 			&& !excludedMove
 		//	&&  pos.non_pawn_material(us)  // これ終盤かどうかを意味する。将棋でもこれに相当する条件が必要かも。
-			&& (ss->ply >= thisThread->nmpMinPly))
+			&&  ss->ply >= thisThread->nmpMinPly
+			&&  beta > VALUE_TB_LOSS_IN_MAX_PLY)
 			// 同じ手番側に連続してnull moveを適用しない
 		{
 			ASSERT_LV3(eval - beta >= 0);
