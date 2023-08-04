@@ -2729,12 +2729,12 @@ namespace {
 						// このとき相手からの詰みがあるかどうかを調べるなどしたほうが良いなら
 						// ここに書くべし。
 						
-						// Reduce other moves if we have found at least one score improvement
-						// Reduce more for depth > 3 and depth < 12 (~1 Elo)
-						if (   depth > 1
+						// Reduce other moves if we have found at least one score improvement(~2 Elo)
+						if (   depth > 2
+							&& depth < 12
 							&& beta  <  VALUE_KNOWN_WIN
 							&& alpha > -VALUE_KNOWN_WIN)
-							depth -= depth > 3 && depth < 12 ? 2 : 1;
+							depth -= 2;
 
 						ASSERT_LV3(depth > 0);
 					}
