@@ -2721,7 +2721,7 @@ namespace {
 
 					// Update alpha! Always alpha < beta
 					// alpha値を更新したので更新しておく
-					if (PvNode && value < beta)
+					if (value < beta)
 					{
 						alpha = value;
 
@@ -3123,9 +3123,9 @@ namespace {
 				return bestValue;
 			}
 
-			// 王手がかかっていなくてPvNodeでかつ、bestValueがalphaより大きいならそれをalphaの初期値に使う。
+			// 王手がかかっていなくて、bestValueがalphaより大きいならそれをalphaの初期値に使う。
 			// 王手がかかっているなら全部の指し手を調べたほうがいい。
-			if (PvNode && bestValue > alpha)
+			if (bestValue > alpha)
 				alpha = bestValue;
 
 			// futilityの基準となる値をbestValueにmargin値を加算したものとして、
@@ -3311,7 +3311,7 @@ namespace {
 						// fail-highの場合もPVは更新する。
 						update_pv(ss->pv, move, (ss + 1)->pv);
 
-					if (PvNode && value < beta) // Update alpha here!
+					if (value < beta) // Update alpha here!
 						// alpha値の更新はこのタイミングで良い。
 						// なぜなら、このタイミング以外だと枝刈りされるから。(else以下を読むこと)
 						alpha = value;
