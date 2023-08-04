@@ -2384,6 +2384,10 @@ namespace {
 
 					else if (ttValue >= beta)
 						extension = -2 - !PvNode;
+					
+					// If we are on a cutNode, reduce it based on depth (negative extension) (~1 Elo)
+					else if (cutNode)
+						extension = depth > 8 && depth < 17 ? -3 : -1;
 
 					// If the eval of ttMove is less than value, we reduce it (negative extension)
 					else if (ttValue <= value)
