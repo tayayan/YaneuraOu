@@ -1873,10 +1873,7 @@ namespace {
 			&& (ss - 1)->statScore < PARAM_NULL_MOVE_MARGIN0/*14695*/
 			&&  eval >= beta
 			&&  eval >= ss->staticEval
-			&&  ss->staticEval >= beta - PARAM_NULL_MOVE_MARGIN1 /*15*/ * depth
-								- improvement / PARAM_NULL_MOVE_MARGIN3 /* 15 */
-								+ PARAM_NULL_MOVE_MARGIN4 /*198*/
-								/* + complexity / 28 */
+			&&  ss->staticEval >= beta - PARAM_NULL_MOVE_MARGIN1 /*15*/ * depth	+ PARAM_NULL_MOVE_MARGIN4 /*198*/
 			&& !excludedMove
 		//	&&  pos.non_pawn_material(us)  // これ終盤かどうかを意味する。将棋でもこれに相当する条件が必要かも。
 			&&  ss->ply >= thisThread->nmpMinPly
