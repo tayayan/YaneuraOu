@@ -238,7 +238,7 @@ namespace {
 	// History and stats update bonus, based on depth
 	// depthに基づく、historyとstatsのupdate bonus
 	int stat_bonus(Depth d) {
-		return std::min((9 * d + 270) * d - 311, 2145);
+		return d > 14 ? 73 : 6 * d * d + 229 * d - 215;
 	}
 
 	// チェスでは、引き分けが0.5勝扱いなので引き分け回避のための工夫がしてあって、
@@ -360,7 +360,7 @@ void Search::init()
 	// 0.05とか変更するだけで勝率えらく変わる
 
 	for (int i = 1; i < MAX_MOVES; ++i)
-		Reductions[i] = int(20.81 * std::log(i));
+		Reductions[i] = int(21.9 * std::log(i));
 
 	// Stockfish11.1で現在のスレッド数設定に依存する項が追加された。(以下コード)
 	// このため、スレッド数が確定するisreadyタイミングで初期化する必要があるが、
